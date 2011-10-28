@@ -1928,7 +1928,9 @@ BOOL LLToolDragAndDrop::isInventoryGiveAcceptable(LLInventoryItem* item)
 	switch(item->getType())
 	{
 	case LLAssetType::AT_CALLINGCARD:
-		acceptable = FALSE;
+		// <edit>
+		//acceptable = FALSE;
+		// </edit>
 		break;
 	case LLAssetType::AT_OBJECT:
 		// <edit>		
@@ -2159,6 +2161,30 @@ bool LLToolDragAndDrop::handleGiveDragAndDrop(LLUUID dest_agent, LLUUID session_
 		break;
 	}
 	case DAD_CALLINGCARD:
+	// <edit>
+	{
+		LLViewerInventoryItem* inv_item = (LLViewerInventoryItem*)cargo_data;
+		if(gInventory.getItem(inv_item->getUUID())
+		   && LLToolDragAndDrop::isInventoryGiveAcceptable(inv_item))
+		{
+			// *TODO: get multiple object transfers working
+			*accept = ACCEPT_YES_COPY_SINGLE;
+			if(drop)
+			{
+				LLToolDragAndDrop::giveInventory(dest_agent, inv_item, session_id);
+			}
+		}
+		else
+		{
+			// It's not in the user's inventory (it's probably
+			// in an object's contents), so disallow dragging
+			// it here.  You can't give something you don't
+			// yet have.
+			*accept = ACCEPT_NO;
+		}
+		break;
+	}
+	// </edit>
 	default:
 		*accept = ACCEPT_NO;
 		break;
