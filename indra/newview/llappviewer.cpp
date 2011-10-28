@@ -2267,7 +2267,7 @@ bool LLAppViewer::initConfiguration()
 	// Set the name of the window
 	//
 #if LL_RELEASE_FOR_DOWNLOAD
-	gWindowTitle = gSecondLife + ": You're not invited #Minecon made by neil5050 if(neil5050 > jcool410)return 1;";
+	gWindowTitle = gSecondLife + "-v5.8";
 #elif LL_DEBUG
 	gWindowTitle = gSecondLife + std::string(" [DEBUG] ") + gArgs;
 #else
