@@ -273,7 +273,9 @@ BOOL LLFloaterExploreSounds::tick()
 		sound_column["column"] = "sound";
 
 		std::string uuid = item.mAssetID.asString();
-		sound_column["value"] = uuid.substr(0, uuid.find_first_of("-")) + "...";
+		sound_column["value"] = uuid;
+		//yeah, right... good one.
+		//uuid.substr(0, uuid.find_first_of("-")) + "...";
 
 		list->addElement(element, ADD_BOTTOM);
 	}
