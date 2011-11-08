@@ -207,7 +207,11 @@ bool stort_calls(const std::pair<std::string, U32>& left, const std::pair<std::s
 	return left.second < right.second;
 }
 #endif //PROF_CTRL_CALLS
+#if LL_DARWIN //Macs think different, duh
+#define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	v(n,d)
+#else
 #define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	##v(n,d)
+#endif
 bool cmd_line_chat(std::string revised_text, EChatType type)
 {
 	static const LLCachedControl<bool> sAscentCmdLine("AscentCmdLine",false);

@@ -38,7 +38,7 @@
 #include "llstat.h"
 #include "llstl.h"
 
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <boost/signals/connection.hpp>
 #include <boost/bind.hpp>
 
@@ -446,9 +446,9 @@ public:
 
 private:
 	// message handler functions (this is set by each application)
-	typedef boost::signal<void (LLMessageSystem*)> message_signal_t;
+	typedef boost::signals2::signal<void (LLMessageSystem*)> message_signal_t;
 	message_signal_t mMessageSignal;
-	typedef std::map<message_handler_func_t,boost::signals::connection> connection_map_t;
+	typedef std::map<message_handler_func_t,boost::signals2::connection> connection_map_t;
 	connection_map_t mConnectionMap;
 };
 

@@ -19,3 +19,9 @@
 /LICENSES/
 /edited-files.txt
 qtcreator-build/
+*.dir
+CMakeDirectoryInformation.cmake
+cmake_install.cmake
+Makefile
+progress.marks
+/indra/CMakeFiles

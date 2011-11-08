@@ -136,7 +136,7 @@ class ViewerManifest(LLManifest):
     def installer_prefix(self):
         mapping={"secondlife":'SecondLife_',
                  "snowglobe":'Snowglobe_',
-                 "singularity":'Singularity_'}
+                 "partyhat":'PartyHat_'}
         return mapping[self.viewer_branding_id()]
 
     def flags_list(self):
@@ -172,7 +172,7 @@ class ViewerManifest(LLManifest):
 
 class WindowsManifest(ViewerManifest):
     def final_exe(self):
-        return 'SingularityViewer.exe'
+        return 'PartyHatViewer.exe'
 
 
     def construct(self):
@@ -390,17 +390,17 @@ class WindowsManifest(ViewerManifest):
         !define VERSION_LONG "%(version)s"
         !define VERSION_DASHES "%(version_dashes)s"
         """ % substitution_strings
-        installer_file = "Singularity_%(version_short)s_Setup.exe"
+        installer_file = "PartyHat_%(version_short)s_Setup.exe"
         grid_vars_template = """
         OutFile "%(installer_file)s"
-        !define VIEWERNAME "Singularity Viewer"
+        !define VIEWERNAME "PartyHat Viewer"
         !define INSTFLAGS "%(flags)s"
-        !define INSTNAME   "SingularityViewer"
-        !define SHORTCUT   "Singularity Viewer"
+        !define INSTNAME   "PartyHatViewer"
+        !define SHORTCUT   "PartyHat Viewer"
         !define URLNAME   "secondlife"
-        !define INSTALL_ICON "install_icon_singularity.ico"
-        !define UNINSTALL_ICON "install_icon_singularity.ico"
-        Caption "Singularity Viewer ${VERSION}"
+        !define INSTALL_ICON "install_icon_partyhat.ico"
+        !define UNINSTALL_ICON "install_icon_partyhat.ico"
+        Caption "PartyHat Viewer ${VERSION}"
         """
         if 'installer_name' in self.args:
             installer_file = self.args['installer_name']
@@ -473,7 +473,7 @@ class DarwinManifest(ViewerManifest):
                 self.path("SecondLife.nib")
 
    			  # SG:TODO
-                self.path("../newview/res/singularity.icns", dst="singularity.icns")
+                self.path("../newview/res/partyhat.icns", dst="partyhat.icns")
 
                 # Translations
                 self.path("English.lproj")
@@ -572,10 +572,10 @@ class DarwinManifest(ViewerManifest):
                                  { 'viewer_binary' : self.dst_path_of('Contents/MacOS/'+self.app_name())})
 
     def app_name(self):
-        return "Singularity"
+        return "PartyHat"
         
     def info_plist_name(self):
-        return "Info-Singularity.plist"
+        return "Info-PartyHat.plist"
 
     def package_finish(self):
         channel_standin = self.app_name()
@@ -709,13 +709,13 @@ class LinuxManifest(ViewerManifest):
         self.path("featuretable_linux.txt")
 
     def wrapper_name(self):
-        return 'singularity'
+        return 'partyhat'
 
     def binary_name(self):
-        return 'singularity-do-not-run-directly'
+        return 'partyhat-do-not-run-directly'
     
     def icon_name(self):
-        return "singularity_icon.png"
+        return "partyhat_icon.png"
 
     def package_finish(self):
         if 'installer_name' in self.args:

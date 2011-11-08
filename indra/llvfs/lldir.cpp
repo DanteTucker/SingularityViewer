@@ -270,7 +270,7 @@ std::string LLDir::buildSLOSCacheDir() const
 	}
 	else
 	{
-		res = getOSCacheDir() + mDirDelimiter + "PartyHat";
+		res = getOSCacheDir() + mDirDelimiter + "SingularityViewer";
 	}
 	return res;
 }

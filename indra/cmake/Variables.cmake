@@ -127,8 +127,8 @@ set(VIEWER_LOGIN_CHANNEL ${VIEWER_CHANNEL} CACHE STRING "Fake login channel for 
 set(VIEWER_BRANDING_ID "partyhat" CACHE STRING "Viewer branding id (currently secondlife|snowglobe)")
 
 # *TODO: break out proper Branding-secondlife.cmake, Branding-snowglobe.cmake, etc
-set(VIEWER_BRANDING_NAME "Party Hat")
-set(VIEWER_BRANDING_NAME_CAMELCASE "Party Hat")
+set(VIEWER_BRANDING_NAME "PartyHat")
+set(VIEWER_BRANDING_NAME_CAMELCASE "PartyHat")
 
 set(STANDALONE OFF CACHE BOOL "Do not use Linden-supplied prebuilt libraries.")
 

@@ -239,7 +239,7 @@ void LLKeyTool::callback(LLUUID id, LLKeyType key_type, LLAssetType::EType asset
 
 void LLKeyTool::tryAgent()
 {
-	gCacheName->get(mKey, FALSE, onCacheName);
+	gCacheName->get(mKey, FALSE, (LLCacheNameCallback)(&onCacheName));
 }
 
 void LLKeyTool::onCacheName(const LLUUID& id, const std::string& name, bool is_group)

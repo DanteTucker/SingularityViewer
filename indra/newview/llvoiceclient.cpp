@@ -3933,7 +3933,7 @@ void LLVoiceClient::sessionAddedEvent(
 	//Simman: Sets up an easier solution to logging sessions.
 	LLChat chat;
 	chat.mSourceType = CHAT_SOURCE_SYSTEM;
-	chat.mText = llformat("Voice: connected to %s", uriString);
+	chat.mText = llformat("Voice: connected to %s", uriString.c_str());
 	LLFloaterChat::addChat(chat);
 
 	session = addSession(uriString, sessionHandle);
@@ -3958,7 +3958,7 @@ void LLVoiceClient::sessionAddedEvent(
 
 				std::string SIPURI_proper = sipURIFromID(session->mCallerID);// and generate a proper URI from the ID.
 				setSessionURI(session, SIPURI_proper);
-				chat.mText = llformat("Voice: SIPURI %s", SIPURI_proper);//just gunna post this, brb lol
+				chat.mText = llformat("Voice: SIPURI %s", SIPURI_proper.c_str());//just gunna post this, brb lol
 				LLFloaterChat::addChat(chat);
 			}
 			else
