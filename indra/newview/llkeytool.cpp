@@ -20,6 +20,11 @@
 #include "lltoolcomp.h" // used by openKey
 
 std::list<LLKeyTool*> LLKeyTool::mKeyTools;
+boost::signals2::connection LLKeyTool::mObjectPropertiesFamilyConnection;
+boost::signals2::connection LLKeyTool::mParcelInfoReplyConnection;
+boost::signals2::connection LLKeyTool::mImageDataConnection;
+boost::signals2::connection LLKeyTool::mImageNotInDatabaseConnection;
+boost::signals2::connection LLKeyTool::mTransferInfoConnection;
 
 LLKeyTool::LLKeyTool(LLUUID key, void (*callback)(LLUUID, LLKeyType, LLAssetType::EType, BOOL, void*), void* user_data)
 {
@@ -28,11 +33,11 @@ LLKeyTool::LLKeyTool(LLUUID key, void (*callback)(LLUUID, LLKeyType, LLAssetType
 	//lets add our handlers to the message system.
 	if(mKeyTools.empty())
 	{
-		gMessageSystem->addHandlerFuncFast(_PREHASH_ObjectPropertiesFamily, &onObjectPropertiesFamily);
-		gMessageSystem->addHandlerFuncFast(_PREHASH_ParcelInfoReply, &onParcelInfoReply);
-		gMessageSystem->addHandlerFuncFast(_PREHASH_ImageData, &onImageData);
-		gMessageSystem->addHandlerFuncFast(_PREHASH_ImageNotInDatabase, &onImageNotInDatabase);
-		gMessageSystem->addHandlerFuncFast(_PREHASH_TransferInfo, &onTransferInfo);
+		mObjectPropertiesFamilyConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ObjectPropertiesFamily, &LLKeyTool::onObjectPropertiesFamily);
+		mParcelInfoReplyConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ParcelInfoReply, &LLKeyTool::onParcelInfoReply);
+		mImageDataConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ImageData, &LLKeyTool::onImageData);
+		mImageNotInDatabaseConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ImageNotInDatabase, &LLKeyTool::onImageNotInDatabase);
+		mTransferInfoConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_TransferInfo, &LLKeyTool::onTransferInfo);
 	}
 	mKeyTools.push_back(this);
 	mUserData = user_data;
@@ -71,11 +76,11 @@ LLKeyTool::~LLKeyTool()
 	//if empty remove all callbacks
 	if(mKeyTools.empty())
 	{
-		gMessageSystem->delHandlerFuncFast(_PREHASH_ObjectPropertiesFamily, &onObjectPropertiesFamily);
-		gMessageSystem->delHandlerFuncFast(_PREHASH_ParcelInfoReply, &onParcelInfoReply);
-		gMessageSystem->delHandlerFuncFast(_PREHASH_ImageData, &onImageData);
-		gMessageSystem->delHandlerFuncFast(_PREHASH_ImageNotInDatabase, &onImageNotInDatabase);
-		gMessageSystem->delHandlerFuncFast(_PREHASH_TransferInfo, &onTransferInfo);
+		mObjectPropertiesFamilyConnection.disconnect();
+		mParcelInfoReplyConnection.disconnect();
+		mImageDataConnection.disconnect();
+		mImageNotInDatabaseConnection.disconnect();
+		mTransferInfoConnection.disconnect();
 	}
 }
 
@@ -272,7 +277,7 @@ void LLKeyTool::tryTask()
 }
 
 // static
-void LLKeyTool::onObjectPropertiesFamily(LLMessageSystem *msg, void **user_data)
+void LLKeyTool::onObjectPropertiesFamily(LLMessageSystem *msg)
 {
 	LLUUID id;
 	msg->getUUIDFast(_PREHASH_ObjectData, _PREHASH_ObjectID, id);
@@ -314,7 +319,7 @@ void LLKeyTool::tryParcel()
 	gMessageSystem->sendReliable(gAgent.getRegionHost());
 }
 
-void LLKeyTool::onParcelInfoReply(LLMessageSystem *msg, void **user_data)
+void LLKeyTool::onParcelInfoReply(LLMessageSystem *msg)
 {
 	LLUUID id;
 	msg->getUUIDFast(_PREHASH_Data, _PREHASH_ParcelID, id);
@@ -368,7 +373,7 @@ void LLKeyTool::tryAsset(LLAssetType::EType asset_type)
 }
 
 // static
-void LLKeyTool::onTransferInfo(LLMessageSystem *msg, void **user_data)
+void LLKeyTool::onTransferInfo(LLMessageSystem *msg)
 {
 	S32 params_size = msg->getSize(_PREHASH_TransferInfo, _PREHASH_Params);
 	if(params_size < 1) return;
@@ -386,7 +391,7 @@ void LLKeyTool::onTransferInfo(LLMessageSystem *msg, void **user_data)
 }
 
 // static
-void LLKeyTool::onImageData(LLMessageSystem *msg, void **user_data)
+void LLKeyTool::onImageData(LLMessageSystem *msg)
 {
 	LLUUID id;
 	msg->getUUIDFast(_PREHASH_ImageID, _PREHASH_ID, id, 0);
@@ -394,7 +399,7 @@ void LLKeyTool::onImageData(LLMessageSystem *msg, void **user_data)
 }
 
 // static
-void LLKeyTool::onImageNotInDatabase(LLMessageSystem* msg, void **user_data)
+void LLKeyTool::onImageNotInDatabase(LLMessageSystem* msg)
 {
 	LLUUID id;
 	msg->getUUIDFast(_PREHASH_ImageID, _PREHASH_ID, id, 0);

@@ -61,7 +61,7 @@ public:
 	static void results();
 	static void toggle();
 	static JCFloaterAreaSearch* getInstance() { return sInstance; }
-	static void processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data);
+	static void processObjectPropertiesFamily(LLMessageSystem* msg);
 
 private:
 	static void checkRegion();

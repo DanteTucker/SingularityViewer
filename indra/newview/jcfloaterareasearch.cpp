@@ -311,7 +311,7 @@ void JCFloaterAreaSearch::results()
 }
 
 // static
-void JCFloaterAreaSearch::processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data)
+void JCFloaterAreaSearch::processObjectPropertiesFamily(LLMessageSystem* msg)
 {
 	checkRegion();
 

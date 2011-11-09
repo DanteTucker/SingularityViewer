@@ -45,8 +45,8 @@ private:
 	static LLSD* getprim(LLUUID id);
 	static void completechk();
 public:
-	static void processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data);
-	static void processObjectProperties(LLMessageSystem* msg, void** user_data);
+	static void processObjectPropertiesFamily(LLMessageSystem* msg);
+	static void processObjectProperties(LLMessageSystem* msg);
 	void inventoryChanged(LLViewerObject* obj,
 								 LLInventoryObject::object_list_t* inv,
 								 S32 serial_num,

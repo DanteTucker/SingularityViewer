@@ -92,7 +92,7 @@ void ScriptCounter::showResult(std::string output)
 	init();
 }
 
-void ScriptCounter::processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data)
+void ScriptCounter::processObjectPropertiesFamily(LLMessageSystem* msg)
 {
 	LLUUID object_id;
 	msg->getUUIDFast(_PREHASH_ObjectData, _PREHASH_ObjectID,object_id );
@@ -118,7 +118,7 @@ void ScriptCounter::processObjectPropertiesFamily(LLMessageSystem* msg, void** u
 	}
 }
 
-void ScriptCounter::processObjectProperties(LLMessageSystem* msg, void** user_data)
+void ScriptCounter::processObjectProperties(LLMessageSystem* msg)
 {
 	std::string user_msg;
 	LLUUID object_id;
