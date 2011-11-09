@@ -95,6 +95,10 @@ private:
 	};
 	
 	LLObjectSelectionHandle mSelection;
+
+
+	static boost::signals2::connection mObjectPropertiesFamilyConnection;
+	static boost::signals2::connection mKillObjectConnection;
 };
 
 #endif

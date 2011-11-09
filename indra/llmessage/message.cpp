@@ -6,13 +6,10 @@
  * 
  * Copyright (c) 2001-2009, Linden Research, Inc.
  * 
- * Second Life Viewer Source Code
- * The source code in this file ("Source Code") is provided by Linden Lab
- * to you under the terms of the GNU General Public License, version 2.0
- * ("GPL"), unless you have obtained a separate licensing agreement
- * ("Other License"), formally executed by you and Linden Lab.  Terms of
- * the GPL can be found in doc/GPL-license.txt in this distribution, or
- * online at http://secondlifegrid.net/programs/open_source/licensing/gplv2
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation;
+ * version 2.1 of the License only.
  * 
  * There are special exceptions to the terms and conditions of the GPL as
  * it is applied to this Source Code. View the full text of the exception
@@ -3010,43 +3007,32 @@ void LLMessageSystem::addTemplate(LLMessageTemplate *templatep)
 }
 
 
-void LLMessageSystem::setHandlerFuncFast(const char *name, message_handler_func_t handler_func, void **user_data)
+boost::signals2::connection LLMessageSystem::setHandlerFuncFast(const char *name, void (*handler_func)(LLMessageSystem *msgsystem, void **user_data), void **user_data)
 {
 	LLMessageTemplate* msgtemplate = get_ptr_in_map(mMessageTemplates, name);
-	if (msgtemplate)
+	if(msgtemplate)
 	{
-		msgtemplate->setHandlerFunc(handler_func, user_data);
+		return msgtemplate->setHandlerFunc(handler_func, user_data);
 	}
 	else
 	{
-		LL_ERRS("Messaging") << name << " is not a known message name!" << llendl;
+		LL_ERRS("Messaging") << name << " is not a known message name!" << LL_ENDL;
 	}
+	return boost::signals2::connection();//dummy connection.
 }
 
-void LLMessageSystem::addHandlerFuncFast(const char *name, message_handler_func_t handler_func, void **user_data)
+boost::signals2::connection LLMessageSystem::addHandlerFuncFast(const char *name, boost::function<void (LLMessageSystem *msgsystem)> handler_slot)
 {
 	LLMessageTemplate* msgtemplate = get_ptr_in_map(mMessageTemplates, name);
-	if (msgtemplate)
+	if(msgtemplate)
 	{
-		msgtemplate->addHandlerFunc(handler_func, user_data);
+		return msgtemplate->addHandlerFunc(handler_slot);
 	}
 	else
 	{
-		llerrs << name << " is not a known message name!" << llendl;
+		LL_ERRS("Messaging") << name << " is not a known message name!" << LL_ENDL;
 	}
-}
-
-void LLMessageSystem::delHandlerFuncFast(const char *name, message_handler_func_t handler_func)
-{
-	LLMessageTemplate* msgtemplate = get_ptr_in_map(mMessageTemplates, name);
-	if (msgtemplate)
-	{
-		msgtemplate->delHandlerFunc(handler_func);
-	}
-	else
-	{
-		llerrs << name << " is not a known message name!" << llendl;
-	}
+	return boost::signals2::connection();//dummy connection.
 }
 
 bool LLMessageSystem::callHandler(const char *name,

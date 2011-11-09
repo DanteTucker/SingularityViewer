@@ -45,6 +45,12 @@ public:
 	LLUUID mKey;
 	std::map<LLKeyType, BOOL> mKeyTypesDone;
 	std::map<LLAssetType::EType, BOOL> mAssetTypesDone;
+private:
+	static boost::signals2::connection mObjectPropertiesFamilyConnection;
+	static boost::signals2::connection mParcelInfoReplyConnection;
+	static boost::signals2::connection mImageDataConnection;
+	static boost::signals2::connection mImageNotInDatabaseConnection;
+	static boost::signals2::connection mTransferInfoConnection;
 };
 
 #endif

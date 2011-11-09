@@ -39,8 +39,7 @@
 #include "llstl.h"
 
 #include <boost/signals2.hpp>
-#include <boost/signals/connection.hpp>
-#include <boost/bind.hpp>
+using namespace boost::signals2::keywords;
 
 class LLMsgVarData
 {
@@ -294,7 +293,9 @@ public:
 		mTotalDecodeTime(0.f),
 		mMaxDecodeTimePerMsg(0.f),
 		mBanFromTrusted(false),
-		mBanFromUntrusted(false)
+		mBanFromUntrusted(false)//,
+		//mHandlerFunc(NULL), 
+		//mUserData(NULL)
 	{ 
 		mName = LLMessageStringTable::getInstance()->getString(name);
 	}
@@ -362,34 +363,26 @@ public:
 		return mDeprecation;
 	}
 	
-	void setHandlerFunc(message_handler_func_t handler_func, void **user_data)
+	//legacy support
+	boost::signals2::connection setHandlerFunc(void (*handler_func)(LLMessageSystem *msgsystem, void **user_data), void **user_data)
 	{
-		if(!mMessageSignal.empty() || mConnectionMap.size() > 0){
+		disconnectAllSlots();
+		if(handler_func)
+			return addHandlerFunc(boost::bind(handler_func,_1,user_data));
+		else //keep behavior of NULL handler_func clear callbacks
+			return boost::signals2::connection();
+	}
+
+	boost::signals2::connection addHandlerFunc(boost::function<void (LLMessageSystem *msgsystem)> handler_slot)
+	{
+		return mMessageSignal.connect(handler_slot);
+	}
+
+	void disconnectAllSlots()
+	{
+		//if mMessageSignal is not empty clear it out.
+		if(!mMessageSignal.empty())
 			mMessageSignal.disconnect_all_slots();
-			mConnectionMap.erase(mConnectionMap.begin(),mConnectionMap.end());
-		}
-		//we want to make sure if we set to NULL it will not add a null entry to the signal.
-		if(handler_func != NULL)
-		{
-			addHandlerFunc(handler_func,user_data);
-		}
-	}
-
-	void addHandlerFunc(message_handler_func_t handler_func, void **user_data)
-	{
-		if(mConnectionMap.find(handler_func) == mConnectionMap.end())
-			mConnectionMap[handler_func] = mMessageSignal.connect(boost::bind(handler_func,_1,user_data));
-	}
-
-	void delHandlerFunc(message_handler_func_t handler_func)
-	{
-		connection_map_t::iterator iter = mConnectionMap.find(handler_func);
-		if(iter != mConnectionMap.end())
-		{
-			//make sure to disconnect first
-			mConnectionMap[handler_func].disconnect();
-			mConnectionMap.erase(iter);
-		}
 	}
 
 	BOOL callHandlerFunc(LLMessageSystem *msgsystem) const
@@ -397,6 +390,7 @@ public:
 		if (!mMessageSignal.empty())
 		{
             LLPerfBlock msg_cb_time("msg_cb", mName);
+			//fire and forget
 			mMessageSignal(msgsystem);
 			return TRUE;
 		}
@@ -445,11 +439,11 @@ public:
 	bool									mBanFromUntrusted;
 
 private:
-	// message handler functions (this is set by each application)
-	typedef boost::signals2::signal<void (LLMessageSystem*)> message_signal_t;
-	message_signal_t mMessageSignal;
-	typedef std::map<message_handler_func_t,boost::signals2::connection> connection_map_t;
-	connection_map_t mConnectionMap;
+	// message handler function (this is set by each application)
+	//void									(*mHandlerFunc)(LLMessageSystem *msgsystem, void **user_data);
+	//void									**mUserData;
+	typedef boost::signals2::signal_type<void (LLMessageSystem*), mutex_type<boost::signals2::dummy_mutex> >::type message_signal_t;
+	message_signal_t						mMessageSignal;
 };
 
 #endif // LL_LLMESSAGETEMPLATE_H
