@@ -27,12 +27,12 @@ public:
 	static void openKey(LLUUID id, LLKeyType key_type, LLAssetType::EType = LLAssetType::AT_NONE);
 	static void callback(LLUUID id, LLKeyType key_type, LLAssetType::EType asset_type, BOOL is);
 	static void onCacheName(const LLUUID& id, const std::string& name, bool is_group);
-	static void onObjectPropertiesFamily(LLMessageSystem *msg, void **user_data);
+	static void onObjectPropertiesFamily(LLMessageSystem *msg);
 	static void gotGroupProfile(LLUUID id);
-	static void onParcelInfoReply(LLMessageSystem *msg, void **user_data);
-	static void onTransferInfo(LLMessageSystem *msg, void **user_data);
-	static void onImageData(LLMessageSystem *msg, void **user_data);
-	static void onImageNotInDatabase(LLMessageSystem* msg, void **user_data);
+	static void onParcelInfoReply(LLMessageSystem *msg);
+	static void onTransferInfo(LLMessageSystem *msg);
+	static void onImageData(LLMessageSystem *msg);
+	static void onImageNotInDatabase(LLMessageSystem* msg);
 	void (*mCallback)(LLUUID, LLKeyType, LLAssetType::EType, BOOL, void*);
 	void* mUserData;
 	void tryAgent();

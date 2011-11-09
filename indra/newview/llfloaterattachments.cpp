@@ -52,8 +52,8 @@ LLFloaterAttachments::LLFloaterAttachments()
 
 	if(LLFloaterAttachments::instances.empty())
 	{
-		mObjectPropertiesFamilyConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ObjectPropertiesFamily, &processObjectPropertiesFamily);
-		mKillObjectConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_KillObject, &dispatchKillObject);
+		mObjectPropertiesFamilyConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_ObjectPropertiesFamily, &LLFloaterAttachments::processObjectPropertiesFamily);
+		mKillObjectConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_KillObject, &LLFloaterAttachments::dispatchKillObject);
 	}
 
 	LLFloaterAttachments::instances.push_back(this);
@@ -395,7 +395,7 @@ void LLFloaterAttachments::receiveHUDPrimInfo(LLHUDAttachment* hud_attachment)
 	llinfos << "Prim: " << mReceivedProps << ":" << mPendingRequests.size() << llendl;
 }
 
-void LLFloaterAttachments::dispatchKillObject(LLMessageSystem* msg, void** user_data)
+void LLFloaterAttachments::dispatchKillObject(LLMessageSystem* msg)
 {
 	std::vector<LLFloaterAttachments*>::iterator iter = LLFloaterAttachments::instances.begin();
 	std::vector<LLFloaterAttachments*>::iterator end = LLFloaterAttachments::instances.end();
@@ -482,7 +482,7 @@ void LLFloaterAttachments::receiveHUDPrimRoot(LLHUDAttachment* hud_attachment)
 	}
 }
 
-void LLFloaterAttachments::processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data)
+void LLFloaterAttachments::processObjectPropertiesFamily(LLMessageSystem* msg)
 {
 	U32 request_flags;
 	LLUUID id;

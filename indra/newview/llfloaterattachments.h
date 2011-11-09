@@ -81,8 +81,8 @@ public:
 
 	static void dispatchHUDObjectProperties(LLHUDAttachment* hud_attachment);
 
-	static void dispatchKillObject(LLMessageSystem* msg, void** user_data);
-	static void processObjectPropertiesFamily(LLMessageSystem* msg, void** user_data);
+	static void dispatchKillObject(LLMessageSystem* msg);
+	static void processObjectPropertiesFamily(LLMessageSystem* msg);
 	
 private:
 	virtual ~LLFloaterAttachments();
