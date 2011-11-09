@@ -61,8 +61,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_LL_ICON             ICON                    "singularity_icon.ico"
-IDI_LCD_LL_ICON         ICON                    "singularity_icon.ico"
+IDI_LL_ICON             ICON                    "PartyHat.ico"
+IDI_LCD_LL_ICON         ICON                    "PartyHat.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -158,7 +158,7 @@ BEGIN
             VALUE "FileDescription", "Party Hat Viewer"
             VALUE "FileVersion", "1.5.0.0"
             VALUE "InternalName", "Second Life"
-            VALUE "LegalCopyright", "Copyright © 2001-2010, Linden Research, Inc."
+            VALUE "LegalCopyright", "Copyright ï¿½ 2001-2010, Linden Research, Inc."
             VALUE "OriginalFilename", "partyhat.exe"
             VALUE "ProductName", "Party Hat Viewer"
             VALUE "ProductVersion", "1.5.0.0"

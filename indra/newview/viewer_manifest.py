@@ -473,7 +473,7 @@ class DarwinManifest(ViewerManifest):
                 self.path("SecondLife.nib")
 
    			  # SG:TODO
-                self.path("../newview/res/partyhat.icns", dst="partyhat.icns")
+                self.path("../newview/res/PartyHat.icns", dst="PartyHat.icns")
 
                 # Translations
                 self.path("English.lproj")

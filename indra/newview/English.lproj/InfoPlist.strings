@@ -1,7 +1,6 @@
 /* Localized versions of Info.plist keys */
 
-CFBundleName = "Singularity";
+CFBundleName = "PartyHat";
 
-CFBundleShortVersionString = "Singularity Viewer 1.5.0.0";
-CFBundleGetInfoString = "Singularity Viewer 1.5.0.0, Copyright 2010 Siana Gearz";
-
+CFBundleShortVersionString = "PartyHat Viewer 1.6.0.2";
+CFBundleGetInfoString = "PartyHat Viewer 1.6.0.2, Copyright 2011 PinkiePie Research Inc.";
