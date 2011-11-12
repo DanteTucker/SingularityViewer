@@ -566,7 +566,7 @@ windows/i686/vs/2003 -- specify a windows visual studio 2003 package"""
                 except AttributeError:
                     _extractall(tar, path=install_dir)
             symlinks = []
-            if _get_platform() == 'linux' or _get_platform() == 'linux64':
+            if _get_platform() == 'linux':
                 first = 1
                 for tfile in tar.getnames():
                     if tfile.find('.so.') > 0:
@@ -813,12 +813,12 @@ def _get_platform():
         'solaris' : 'solaris'
         }
     this_platform = platform_map[sys.platform]
-    if this_platform == 'linux':
-        if platform.architecture()[0] == '64bit':
+    # if this_platform == 'linux':
+        # if platform.architecture()[0] == '64bit':
             # TODO -- someday when install.py accepts a platform of the form 
             # os/arch/compiler/compiler_version then we can replace the 
             # 'linux64' platform with 'linux/x86_64/gcc/4.1'
-            this_platform = 'linux64'
+            # this_platform = 'linux64'
     return this_platform
 
 def _getuser():

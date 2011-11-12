@@ -207,7 +207,7 @@ bool stort_calls(const std::pair<std::string, U32>& left, const std::pair<std::s
 	return left.second < right.second;
 }
 #endif //PROF_CTRL_CALLS
-#if LL_DARWIN //Macs think different, duh
+#if LL_DARWIN || LL_LINUX //Unix systems think easier
 #define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	v(n,d)
 #else
 #define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	##v(n,d)
