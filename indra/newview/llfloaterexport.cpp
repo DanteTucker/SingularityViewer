@@ -909,12 +909,15 @@ void LLFloaterExport::receivePrimName(LLViewerObject* object, std::string name, 
 // static
 void LLFloaterExport::receiveObjectProperties(LLUUID fullid, std::string name, std::string desc)
 {
-	LLViewerObject* object = gObjectList.findObject(fullid);
-	std::vector<LLFloaterExport*>::iterator iter = LLFloaterExport::instances.begin();
-	std::vector<LLFloaterExport*>::iterator end = LLFloaterExport::instances.end();
-	for( ; iter != end; ++iter)
+	if(!LLFloaterExport::instances.empty())
 	{
-		(*iter)->receivePrimName(object, name, desc);
+		LLViewerObject* object = gObjectList.findObject(fullid);
+		std::vector<LLFloaterExport*>::iterator iter = LLFloaterExport::instances.begin();
+		std::vector<LLFloaterExport*>::iterator end = LLFloaterExport::instances.end();
+		for( ; iter != end; ++iter)
+		{
+			(*iter)->receivePrimName(object, name, desc);
+		}
 	}
 }
 

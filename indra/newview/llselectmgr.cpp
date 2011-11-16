@@ -4737,11 +4737,11 @@ void LLSelectMgr::processObjectProperties(LLMessageSystem* msg, void** user_data
 			node->mSitName.assign(sit_name);
 			node->mTouchName.assign(touch_name);
 
-			// <edit>
-			LLFloaterExport::receiveObjectProperties(id, name, desc);
-			// </edit>
-
 		}
+
+		// <edit>
+		LLFloaterExport::receiveObjectProperties(id, name, desc);
+		// </edit>
 
 		if(!node)
 			LLFloaterAttachments::dispatchHUDObjectProperties(new LLHUDAttachment(name, desc, owner_id, id, from_task_id, texture_ids, 0, inv_serial));
