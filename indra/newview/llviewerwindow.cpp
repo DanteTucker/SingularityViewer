@@ -962,6 +962,17 @@ BOOL LLViewerWindow::handleMouseUp(LLWindow *window,  LLCoordGL pos, MASK mask)
 
 BOOL LLViewerWindow::handleRightMouseDown(LLWindow *window,  LLCoordGL pos, MASK mask)
 {
+	//From Phoenix
+	gSavedSettings.setBOOL("zmm_rightmousedown",1);
+    if(gAgentCamera.cameraMouselook()&&gSavedSettings.getBOOL("zmm_isinml")==0)
+	{
+		llinfos << "zmmisinml set to true" << llendl;
+		gSavedSettings.setBOOL("zmm_isinml",1);
+		F32 deffov=LLViewerCamera::getInstance()->getDefaultFOV();
+		gSavedSettings.setF32("zmm_deffov",deffov);
+		LLViewerCamera::getInstance()->setDefaultFOV(gSavedSettings.getF32("zmm_deffov")/gSavedSettings.getF32("zmm_mlfov"));
+	}
+	
 	S32 x = pos.mX;
 	S32 y = pos.mY;
 	x = llround((F32)x / mDisplayScale.mV[VX]);
@@ -991,6 +1002,14 @@ BOOL LLViewerWindow::handleRightMouseDown(LLWindow *window,  LLCoordGL pos, MASK
 
 BOOL LLViewerWindow::handleRightMouseUp(LLWindow *window,  LLCoordGL pos, MASK mask)
 {
+	gSavedSettings.setBOOL("zmm_rightmousedown",0);
+	if(gSavedSettings.getBOOL("zmm_isinml")==1)
+	{
+		llinfos << "zmmisinml set to false" << llendl;
+		gSavedSettings.setBOOL("zmm_isinml",0);
+		LLViewerCamera::getInstance()->setDefaultFOV(gSavedSettings.getF32("zmm_deffov"));
+    }
+    
 	BOOL down = FALSE;
 	return handleAnyMouseClick(window,pos,mask,LLMouseHandler::CLICK_RIGHT,down);
 }
@@ -4481,7 +4500,7 @@ BOOL LLViewerWindow::rawSnapshot(LLImageRaw *raw, S32 image_width, S32 image_hei
 		gPipeline.resetDrawOrders();
 	}
 
-	if (high_res && (show_ui || !hide_hud))
+	if (high_res)
 	{
 		send_agent_resume();
 	}
@@ -4501,6 +4520,20 @@ void LLViewerWindow::destroyWindow()
 
 void LLViewerWindow::drawMouselookInstructions()
 {
+	static const F32 INSTRUCTIONS_OPAQUE_TIME = 10.f;
+	static const F32 INSTRUCTIONS_FADE_TIME = 5.f;
+
+	F32 mouselook_duration = gAgentCamera.getMouseLookDuration();
+	if( mouselook_duration >= (INSTRUCTIONS_OPAQUE_TIME+INSTRUCTIONS_OPAQUE_TIME) )
+		return;
+
+	F32 alpha = 1.f;
+
+	if( mouselook_duration > INSTRUCTIONS_OPAQUE_TIME)	//instructions are fading
+	{
+		alpha = (F32) sqrt(1.f-pow(((mouselook_duration-INSTRUCTIONS_OPAQUE_TIME)/INSTRUCTIONS_FADE_TIME),2.f));
+	}
+
 	// Draw instructions for mouselook ("Press ESC to leave Mouselook" in a box at the top of the screen.)
 	const std::string instructions = "Press ESC to leave Mouselook.";
 	const LLFontGL* font = LLResMgr::getInstance()->getRes( LLFONT_SANSSERIF );
@@ -4515,7 +4548,7 @@ void LLViewerWindow::drawMouselookInstructions()
 
 	{
 		gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
-		gGL.color4f( 0.9f, 0.9f, 0.9f, 1.0f );
+		gGL.color4f( 0.9f, 0.9f, 0.9f, alpha );
 		gl_rect_2d( instructions_rect );
 	}
 	
@@ -4523,7 +4556,7 @@ void LLViewerWindow::drawMouselookInstructions()
 		instructions, 0,
 		instructions_rect.mLeft + INSTRUCTIONS_PAD,
 		instructions_rect.mTop - INSTRUCTIONS_PAD,
-		LLColor4( 0.0f, 0.0f, 0.0f, 1.f ),
+		LLColor4( 0.0f, 0.0f, 0.0f, alpha ),
 		LLFontGL::LEFT, LLFontGL::TOP);
 }
 

@@ -801,7 +801,7 @@ void LLInvFVBridge::addDeleteContextMenuOptions(menuentry_vec_t &items,
 	}
 
 	// "Remove link" and "Delete" are the same operation.
-	if (obj && obj->getIsLinkType() && !get_is_item_worn(mUUID))
+	if (obj && obj->getIsLinkType() /* && !get_is_item_worn(mUUID)*/)
 	{
 		items.push_back(std::string("Remove Link"));
 	}
