@@ -473,6 +473,7 @@ public:
 	LLObjectSelectionHandle	getEditSelection() { convertTransient(); return mSelectedObjects; }
 	LLObjectSelectionHandle	getHighlightedObjects() { return mHighlightedObjects; }
 	LLObjectSelectionHandle getHoverObjects() { return mHoverObjects; }
+	U32 getRectSelectedObjectsCount(); //includes children
 
 	////////////////////////////////////////////////////////////////
 	// Grid manipulation

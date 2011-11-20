@@ -7216,3 +7216,15 @@ void LLSelectMgr::sendSelectionMove()
 
 	//saveSelectedObjectTransform(SELECT_ACTION_TYPE_PICK);
 }
+
+U32 LLSelectMgr::getRectSelectedObjectsCount()
+{
+	U32 accumulator = 0;
+	for( std::set<LLPointer<LLViewerObject> >::iterator itr = mRectSelectedObjects.begin();
+		itr != mRectSelectedObjects.end();
+		itr++)
+	{
+		accumulator+= (*itr)->getChildren().size();
+	}
+	return accumulator;
+}

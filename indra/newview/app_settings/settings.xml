@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <llsd>
   <map>
+    <key>MaximumPrimSelection</key>
+    <map>
+      <key>Comment</key>
+      <string>Max number of primitives a load to be selected (child prims included)</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <real>4000</real>
+    </map>
     <key>InterceptorRange</key>
     <map>
       <key>Comment</key>
