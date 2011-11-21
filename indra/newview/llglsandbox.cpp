@@ -243,15 +243,19 @@ void LLToolSelectRect::handleRectangleSelection(S32 x, S32 y, MASK mask)
 			{
 				continue;
 			}
-
+#if 0
+			//silly thing i made when i was sleep deprived. viewer discrestion is adviced.
 			static LLCachedControl<U32> MaximumPrimSelection(gSavedSettings, "MaximumPrimSelection");
 			if(MaximumPrimSelection > 0)
 			{
-				U32 prim_count = LLSelectMgr::getInstance()->getRectSelectedObjectsCount();
-				if ((prim_count + vobjp->getChildren().size()) >= MaximumPrimSelection)
+				U32 selected_prim_count = LLSelectMgr::getInstance()->getSelection()->getObjectCount();
+				U32 highlight_prim_count = LLSelectMgr::getInstance()->getRectSelectedObjectsCount();
+				if ((highlight_prim_count + selected_prim_count +
+					1 + vobjp->getChildren().size())
+					>= MaximumPrimSelection)
 					continue;
 			}
-
+#endif
 			S32 result = LLViewerCamera::getInstance()->sphereInFrustum(drawable->getPositionAgent(), drawable->getRadius());
 			if (result)
 			{

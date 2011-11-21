@@ -7219,7 +7219,7 @@ void LLSelectMgr::sendSelectionMove()
 
 U32 LLSelectMgr::getRectSelectedObjectsCount()
 {
-	U32 accumulator = 0;
+	U32 accumulator = mRectSelectedObjects.size();
 	for( std::set<LLPointer<LLViewerObject> >::iterator itr = mRectSelectedObjects.begin();
 		itr != mRectSelectedObjects.end();
 		itr++)
