@@ -30,6 +30,7 @@ include(LLVFS)
 include(LLWindow)
 include(LLXML)
 include(LScript)
+include(LUA)
 include(Linking)
 include(NDOF)
 include(GooglePerfTools)
@@ -64,10 +65,13 @@ include_directories(
     ${LLWINDOW_INCLUDE_DIRS}
     ${LLXML_INCLUDE_DIRS}
     ${LSCRIPT_INCLUDE_DIRS}
+    ${LUA_INCLUDE_DIRS}
     ${LSCRIPT_INCLUDE_DIRS}/lscript_compile
     )
 
 set(viewer_SOURCE_FILES
+    lllua.cpp
+    llluaconsole.cpp
 	llfloatertextdump.cpp
 	llkeytool.cpp
     llfloaterattachments.cpp
@@ -289,7 +293,7 @@ set(viewer_SOURCE_FILES
     llinventorybackup.cpp
     llinventorybridge.cpp
     llinventoryclipboard.cpp
-	llinventoryicon.cpp
+    llinventoryicon.cpp
     llinventorymodel.cpp
     llinventoryview.cpp
     lljoystickbutton.cpp
@@ -561,9 +565,10 @@ endif ((LINUX OR DARWIN) AND NOT DARWIN_PPC)
 set(viewer_HEADER_FILES
     CMakeLists.txt
     ViewerInstall.cmake
-
-	llfloatertextdump.h
-	llkeytool.h
+    lllua.h
+    llluaconsole.h
+    llfloatertextdump.h
+    llkeytool.h
     llfloaterattachments.h
     llfloaterkeytool.h
     llimportobject.h
@@ -781,7 +786,7 @@ set(viewer_HEADER_FILES
     llinventorybackup.h
     llinventorybridge.h
     llinventoryclipboard.h
-	llinventoryicon.h
+    llinventoryicon.h
     llinventorymodel.h
     llinventoryview.h
     lljoystickbutton.h
@@ -1476,6 +1481,7 @@ target_link_libraries(${VIEWER_BINARY_NAME}
     ${LLWINDOW_LIBRARIES}
     ${LLXML_LIBRARIES}
     ${LSCRIPT_LIBRARIES}
+	${LUA_LIBRARIES}
     ${LLMATH_LIBRARIES}
     ${LLCOMMON_LIBRARIES}
     ${NDOF_LIBRARY}

@@ -416,7 +416,13 @@ std::string LLDir::getExpandedFilename(ELLPath location, const std::string& subd
 		prefix += mDirDelimiter;
 		prefix += "fonts";
 		break;
-		
+
+	case LL_PATH_LUA:
+		prefix = getAppRODataDir();
+		prefix += mDirDelimiter;
+		prefix += "lua";
+		break;
+
 	default:
 		llassert(0);
 	}

@@ -210,6 +210,7 @@
 #include "ascentdaycyclemanager.h"
 #include "llfloaterblacklist.h"
 #include "scriptcounter.h"
+#include "lllua.h"
 // </edit>
 
 #include "llavatarnamecache.h"
@@ -2017,6 +2018,8 @@ bool idle_startup()
 
 		LLRect window(0, gViewerWindow->getWindowHeight(), gViewerWindow->getWindowWidth(), 0);
 		gViewerWindow->adjustControlRectanglesForFirstUse(window);
+
+		LLLuaEngine::getInstance()->load();
 
 		if (gSavedSettings.getBOOL("ShowMiniMap"))
 		{

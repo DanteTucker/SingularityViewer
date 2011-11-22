@@ -1,6 +1,38 @@
 <?xml version="1.0"?>
 <llsd>
   <map>
+    <key>LuaChatColor</key>
+    <map>
+      <key>Comment</key>
+      <string>Color of chat messages from other residents</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Color4</string>
+      <key>Value</key>
+      <array>
+        <real>0.39</real>
+        <real>0.81</real>
+        <real>0.96</real>
+        <real>1.0</real>
+      </array>
+    </map>
+    <key>LuaConsoleRect</key>
+    <map>
+      <key>Comment</key>
+      <string>LOLRectangle</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Rect</string>
+      <key>Value</key>
+      <array>
+        <integer>0</integer>
+        <integer>400</integer>
+        <integer>400</integer>
+        <integer>0</integer>
+      </array>
+    </map>
     <key>MaximumPrimSelection</key>
     <map>
       <key>Comment</key>

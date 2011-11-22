@@ -253,6 +253,7 @@
 #include "llfloatervfs.h"
 #include "llfloatervfsexplorer.h"
 #include "lleventtimer.h"
+#include "llluaconsole.h"
 // </edit>
 
 #include "scriptcounter.h"
@@ -436,6 +437,7 @@ void handle_leave_god_mode(void*);
 // <edit>
 void handle_fake_away_status(void*);
 void handle_area_search(void*);
+void handle_lua_console(void*);
 void handle_interceptor(void*);
 
 // <dogmode> for pose stand
@@ -855,6 +857,7 @@ void init_menus()
 											&handle_blacklist, NULL));
 	menu->append(new LLMenuItemCallGL(	"KeyTool from Clipboard",
 											&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(	"Lua Console", &handle_lua_console, NULL));
 	
 	
 	
@@ -3815,6 +3818,11 @@ void handle_close_all_notifications(void*)
 void handle_area_search(void*)
 {
 	JCFloaterAreaSearch::toggle();
+}
+
+void handle_lua_console(void*)
+{
+	LLFloaterLuaConsole::toggleInstance();
 }
 
 void handle_fake_away_status(void*)

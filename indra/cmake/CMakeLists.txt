@@ -62,6 +62,7 @@ set(cmake_SOURCE_FILES
     LLWindow.cmake
     LLXML.cmake
     LScript.cmake
+    LUA.cmake
     Linking.cmake
     MonoEmbed.cmake
     MySQL.cmake
