@@ -7,22 +7,8 @@ class LLEasyMessageSender
 {
 public:
 	LLEasyMessageSender();
-
+	virtual ~LLEasyMessageSender(){}
 	bool sendMessage(const LLHost& region_host, const std::string& str_message );
-
-	bool luaSendRawMessage(const std::string& region_host, const std::string str_message);
-	bool luaSendRawMessage(const std::string& str_message);
-
-	bool luaSendMessage(const std::string& region_host);
-	bool luaSendMessage();
-
-	void luaNewMessage(const std::string& message_name, const std::string& direction, bool include_agent_boilerplate=false);
-	void luaClearMessage();
-
-	void luaAddBlock(const std::string& blockname);
-
-	void luaAddField(const std::string& name, const std::string& value);
-	void luaAddHexField(const std::string& name, const std::string& value);
 
 private:
 
@@ -44,9 +30,7 @@ private:
 		std::vector<parts_var> vars;
 	};
 
-	std::string mMessageBuffer;
-
-	void printError(const std::string& error);
+	virtual void printError(const std::string& error);
 	std::string mvtstr(e_message_variable_type var_type);
 
 	std::vector<std::string> split(std::string input, std::string separator);

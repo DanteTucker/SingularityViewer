@@ -199,6 +199,8 @@
 #include "rlvhandler.h"
 // [/RLVa:KB]
 
+#include "lllua.h"
+
 // *FIX: These extern globals should be cleaned up.
 // The globals either represent state/config/resource-storage of either 
 // this app, or another 'component' of the viewer. App globals should be 
@@ -934,6 +936,7 @@ bool LLAppViewer::init()
 	LLViewerJoystick::getInstance()->init(false);
 
 	gGLActive = FALSE;
+
 	return true;
 }
 
@@ -3466,7 +3469,7 @@ void LLAppViewer::forceDisconnect(const std::string& mesg)
 void LLAppViewer::badNetworkHandler()
 {
 	// Dump the packet
-	//gMessageSystem->dumpPacketToLog();
+	gMessageSystem->dumpPacketToLog();
 
 	// Flush all of our caches on exit in the case of disconnect due to
 	// invalid packets.
@@ -3613,8 +3616,10 @@ void LLAppViewer::idle()
 
 	LLFrameTimer::updateFrameTimeAndCount();
 	LLEventTimer::updateClass();
+	LLLuaEngine::tick();
 	LLCriticalDamp::updateInterpolants();
 	LLMortician::updateClass();
+
 	F32 dt_raw = idle_timer.getElapsedTimeAndResetF32();
 
 	// Cap out-of-control frame times

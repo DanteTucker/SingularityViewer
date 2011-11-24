@@ -19,7 +19,7 @@ public:
         /*virtual*/ void draw();
         /*virtual*/ void onClose(bool app_quitting = false);
 
-		void addOutput(std::string output, bool error);
+		static void addOutput(std::string output, bool error);
 
 private:
 		static void	onInputEditorGainFocus(LLFocusableElement* caller,void* userdata);

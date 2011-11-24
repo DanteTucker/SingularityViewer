@@ -1,8 +1,11 @@
 # -*- cmake -*-
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND CMAKE_POLICY)
 
 project(lua)
-
-include(00-Common)
 
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
@@ -22,7 +25,6 @@ IF(WIN32)
             -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
             -D_CRT_VCCLRIT_NO_DEPRECATE
             -D_SCL_SECURE_NO_DEPRECATE
-			/EHsc
             )
         ENDIF(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
       ENDIF(NOT MINGW)
@@ -31,6 +33,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 set(lua_SOURCE_FILES
+	lfs.c
+	bit.c
 	lapi.c
 	lauxlib.c
 	lbaselib.c
@@ -64,7 +68,8 @@ set(lua_SOURCE_FILES
 
 set(lua_HEADER_FILES
     CMakeLists.txt
-
+	
+	lfs.h
 	lua.h
 	lualib.h
 	lauxlib.h

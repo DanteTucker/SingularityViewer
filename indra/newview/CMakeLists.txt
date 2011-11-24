@@ -70,8 +70,9 @@ include_directories(
     )
 
 set(viewer_SOURCE_FILES
-    lllua.cpp
-    llluaconsole.cpp
+	lllua.cpp
+	llluabindings.cpp
+	llluaconsole.cpp
 	llfloatertextdump.cpp
 	llkeytool.cpp
     llfloaterattachments.cpp
@@ -565,7 +566,10 @@ endif ((LINUX OR DARWIN) AND NOT DARWIN_PPC)
 set(viewer_HEADER_FILES
     CMakeLists.txt
     ViewerInstall.cmake
+	
+	luna.h
     lllua.h
+	llluabindings.h
     llluaconsole.h
     llfloatertextdump.h
     llkeytool.h

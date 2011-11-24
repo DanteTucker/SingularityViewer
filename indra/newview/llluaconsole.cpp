@@ -5,11 +5,13 @@
 #include "llcallbacklist.h"
 #include "llviewercontrol.h"
 #include "llkeyboard.h"
+#include "llstartup.h"
 
 LLFloaterLuaConsole::LLFloaterLuaConsole(const LLSD& key) :
 LLFloater(std::string("Lua Console"))
 {
-	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_lua_console.xml");
+	//do not open on creation.
+	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_lua_console.xml", NULL, FALSE);
 }
 
 LLFloaterLuaConsole::~LLFloaterLuaConsole()
@@ -84,7 +86,7 @@ void LLFloaterLuaConsole::onClickReset(void *data)
     LLFloaterLuaConsole *self = (LLFloaterLuaConsole *)data;
 
 	LLLuaEngine::getInstance()->deleteSingleton();
-	LLLuaEngine::getInstance()->load();
+	LLLuaEngine::getInstance();
 
     LLLineEditor *editor = self->getChild<LLLineEditor>("Lua Editor", TRUE);
 
@@ -105,7 +107,10 @@ void LLFloaterLuaConsole::onClickClear(void *data)
 
 void LLFloaterLuaConsole::addOutput(std::string output, bool error)
 {
-	if(!instanceVisible())
+	if(LLStartUp::getStartupState() < STATE_LOGIN_SHOW)
+		return;
+
+	if(error && instanceVisible())
 	{
 		showInstance();
 	}
@@ -115,7 +120,7 @@ void LLFloaterLuaConsole::addOutput(std::string output, bool error)
 	else
 		text_color = gSavedSettings.getColor4("ObjectChatColor");
 
-	LLViewerTextEditor *editor = getChild<LLViewerTextEditor>("Lua Output Editor");
+	LLViewerTextEditor *editor = getInstance()->getChild<LLViewerTextEditor>("Lua Output Editor");
 	editor->setParseHTML(TRUE);
 	editor->setParseHighlights(TRUE);
 	editor->appendColoredText(output, false, true, text_color);

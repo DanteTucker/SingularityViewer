@@ -876,6 +876,8 @@ bool idle_startup()
 
 			gSavedSettings.setBOOL("FirstRunThisInstall", FALSE);
 
+			LLLuaEngine::instance(); //create lua instance
+
 			LLStartUp::setStartupState( STATE_LOGIN_WAIT );		// Wait for user input
 		}
 		else
@@ -2019,7 +2021,7 @@ bool idle_startup()
 		LLRect window(0, gViewerWindow->getWindowHeight(), gViewerWindow->getWindowWidth(), 0);
 		gViewerWindow->adjustControlRectanglesForFirstUse(window);
 
-		LLLuaEngine::getInstance()->load();
+		LLLuaEngine::getInstance(); //load is called internally
 
 		if (gSavedSettings.getBOOL("ShowMiniMap"))
 		{

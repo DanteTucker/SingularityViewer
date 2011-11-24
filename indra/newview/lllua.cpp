@@ -1,10 +1,12 @@
 #include "llviewerprecompiledheaders.h"
 #include "lllua.h"
+#include "llluabindings.h"
 #include "llluaconsole.h"
 #include <llchat.h>
+#include "llfloaterchat.h"
 #include "llviewercontrol.h"
-#define LUA_ERROR(s) LL_WARNS("Lua") << s << LL_ENDL
-#define LUA_ERRORED() LUA_ERROR(getError())
+#include "lleasymessagesender.h"
+#include "llstartup.h"
 
 static std::string LuaPrintStrings(lua_State* L)
 { 
@@ -30,12 +32,14 @@ static std::string LuaPrintStrings(lua_State* L)
 
 static int LuaPrint(lua_State* L)
 {
-	LL_INFOS("Lua") << LuaPrintStrings(L) << LL_ENDL;
-	return 0;
-}
-static int LuaPrintConsole(lua_State* L)
-{
-	LLFloaterLuaConsole::getInstance()->addOutput(LuaPrintStrings(L), false);
+	std::string str = LuaPrintStrings(L);
+	LL_INFOS("Lua") << str << LL_ENDL;
+	LLChat chat;
+	chat.mFromName = "Lua";
+	chat.mSourceType = CHAT_SOURCE_SYSTEM;
+	chat.mText = str;
+	LLFloaterChat::addChat(chat);
+	LLFloaterLuaConsole::getInstance()->addOutput(str, false);
 	return 0;
 }
 
@@ -48,16 +52,19 @@ void send_chat_from_viewer(std::string utf8_out_text, EChatType type, S32 channe
 static int LuaSay(lua_State* L)
 {
 	send_chat_from_viewer(std::string(lua_tostring(L, -1)), CHAT_TYPE_NORMAL, 0);
+	lua_pop(L,1);
 	return 0;
 }
 static int LuaShout(lua_State* L)
 {
 	send_chat_from_viewer(std::string(lua_tostring(L, -1)), CHAT_TYPE_SHOUT, 0);
+	lua_pop(L,1);
 	return 0;
 }
 static int LuaWhipser(lua_State* L)
 {
 	send_chat_from_viewer(std::string(lua_tostring(L, -1)), CHAT_TYPE_WHISPER, 0);
+	lua_pop(L,1);
 	return 0;
 }
 LLLuaState::LLLuaState()
@@ -74,15 +81,38 @@ LLLuaEngine::LLLuaEngine()
 {
 }
 
-void LLLuaEngine::initSingleton()
-{
-	
-}
 static int luaOnPanic(lua_State *L)
 {	
 	LUA_ERROR("PANIC: " << lua_tostring(L, -1));
 	lua_pop(L, -1);
 	return 0;
+}
+
+void LLLuaEngine::initSingleton()
+{
+	LL_INFOS("Lua") << "Loading Lua..." << LL_ENDL;
+	lua_atpanic(mState, luaOnPanic);
+
+	LL_INFOS("Lua") << "Load standard library with integrated bit and lfs" << LL_ENDL;
+	luaL_openlibs(mState);
+
+	//load binding
+	bind_print(mState, LuaPrint);
+
+	//hack because im lazy
+	std::string version("_SL_VERSION=\"" + gCurrentVersion + "\"");
+	if(luaL_dostring(mState,version.c_str()))
+	{
+		LUA_ERROR(getError());
+		return;
+	}
+
+	std::string filename = gDirUtilp->getExpandedFilename(LL_PATH_LUA,"_init_.lua");
+	if(luaL_dofile(mState, filename.c_str()))
+	{
+		LUA_ERROR("Failed to load: " << filename << " " << getError());
+		return;
+	}
 }
 
 void LLLuaEngine::doString(const std::string& s)
@@ -95,47 +125,57 @@ void LLLuaEngine::doString(const std::string& s)
 
 void LLLuaEngine::console(const std::string & s)
 {
-	//hook print like commands.
-	bind_print(mState, LuaPrintConsole);
-
 	if(luaL_dostring(mState,s.c_str()))
 	{
-		LLFloaterLuaConsole::getInstance()->addOutput(getError(), true);
+		LUA_ERROR("console" << getError());
 	}
-
-	//unhook print like commands.
-	bind_print(mState, LuaPrint);
 }
 
-bool LLLuaEngine::load()
-{ 
-	LL_INFOS("Lua") << "Loading Lua..." << LL_ENDL;
-	lua_atpanic(mState, luaOnPanic);
+//static
+void LLLuaEngine::tick()
+{
+	if(!LLLuaEngine::instanceExists()) return; //so the tick doesnt happen till we are up and running
 
-	LL_INFOS("Lua") << "Load standard library" << LL_ENDL;
-	luaL_openlibs(mState);
+	//logic that happens when idle
+	if(LLStartUp::getStartupState() == STATE_STARTED && !getInstance()->mRegisteredBindings)
+	{
+		getInstance()->registerBindings();
+		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
+	}
 
-	//load binding
-	bind_print(mState, LuaPrint);
+	LUA_HOOK("OnTick",LUA_ARGS_NONE);
+}
+
+void LLLuaEngine::registerBindings()
+{
 	lua_register(mState, "say", LuaSay);
 	lua_register(mState, "shout", LuaShout);
 	lua_register(mState, "whisper", LuaWhipser);
 
-	//hack because im lazy
-	std::string version("_SL_VERSION=\"" + gCurrentVersion + "\"");
-	if(luaL_dostring(mState,version.c_str()))
-	{
-		LUA_ERRORED();
-		return false;
-	}
+	//luna register
+	luna_register(mState, LunaMessageBuilder);
+	luna_register(mState, LunaMessageHandler);
 
-	std::string filename = gDirUtilp->getExpandedFilename(LL_PATH_LUA,"_init_.lua");
-	if(luaL_dofile(mState, filename.c_str()))
+	mRegisteredBindings = true;
+}
+
+void LLLuaEngine::callHook(const std::string &hook_name, const std::vector< std::string > &args)
+{
+	if(!LLLuaEngine::instanceExists()) return; //dont hook if lua isnt up and running
+
+	LLLuaEngine &self = instance();
+
+	lua_getglobal(self.mState, "callHook");
+	lua_pushstring(self.mState, hook_name.c_str());
+	for(std::vector< std::string >::const_iterator it = args.begin(); it != args.end(); it++)
 	{
-		LUA_ERROR("Failed to load: " << filename << " " << getError());
-		return false;
+		lua_pushstring(self.mState, (*it).c_str());
 	}
-	return true;
+	if(lua_pcall(self.mState, args.size()+1,1,0))
+	{
+		LUA_ERROR(self.getError());
+	}
+	lua_pop(self.mState,1);
 }
 
 const std::string LLLuaEngine::getError()

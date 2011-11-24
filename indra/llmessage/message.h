@@ -361,7 +361,7 @@ public:
 		return isMessageFast(LLMessageStringTable::getInstance()->getString(msg));
 	}
 
-	//void dumpPacketToLog();
+	void dumpPacketToLog();
 
 	char	*getMessageName();
 
@@ -785,18 +785,7 @@ private:
 	LLMessagePollInfo						*mPollInfop;
 
 	U8	mEncodedRecvBuffer[MAX_BUFFER_SIZE];
-#if 0
-// Push current alignment to stack and set alignment to 1 byte boundary
-#pragma pack(push,1)
-
-	struct ReceiveBuffer_t
-	{
-		proxywrap_t header;
-		U8			buffer[MAX_BUFFER_SIZE];
-	} mTrueReceiveBuffer;
-
-#pragma pack(pop)   /* restore original alignment from stack */
-#endif
+	U8	mTrueReceiveBuffer[MAX_BUFFER_SIZE];
 
 	S32	mTrueReceiveSize;
 

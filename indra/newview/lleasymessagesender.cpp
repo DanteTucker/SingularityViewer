@@ -1,12 +1,15 @@
 #include "llviewerprecompiledheaders.h"
 #include "lleasymessagesender.h"
+#include "llluaconsole.h"
 #include "llfloaterchat.h"
 #include "llchat.h"
 #include "llmessagetemplate.h"
 #include "lltemplatemessagebuilder.h"
 #include "lltemplatemessagereader.h"
-#include "llagent.h"
 #include "llviewerregion.h"
+#include "llagent.h"
+#include "llnotificationsutil.h"
+
 
 //we don't use static methods to prepare for when this class will use its own message builder.
 
@@ -241,75 +244,6 @@ bool LLEasyMessageSender::sendMessage(const LLHost& region_host, const std::stri
 	}
 }
 
-
-
-
-//wrapper so we can send whole message-builder format messages from LUA
-bool LLEasyMessageSender::luaSendRawMessage(const std::string& region_host, const std::string str_message)
-{
-	luaClearMessage();
-
-	LLHost proper_region_host = LLHost(region_host);
-
-	//check that this was a valid host
-	if(proper_region_host.isOk())
-		return sendMessage(proper_region_host, str_message);
-
-	return false;
-}
-
-bool LLEasyMessageSender::luaSendRawMessage(const std::string& str_message)
-{
-	return luaSendRawMessage(gAgent.getRegionHost().getString(), str_message);
-}
-
-
-
-
-//buffered message builder methods
-bool LLEasyMessageSender::luaSendMessage(const std::string& region_host)
-{
-	return luaSendRawMessage(region_host, mMessageBuffer);
-}
-
-bool LLEasyMessageSender::luaSendMessage()
-{
-	return luaSendRawMessage(gAgent.getRegionHost().getString(), mMessageBuffer);
-}
-
-void LLEasyMessageSender::luaNewMessage(const std::string& message_name, const std::string& direction, bool include_agent_boilerplate)
-{
-	//clear out any message that may be in the buffer
-	luaClearMessage();
-
-	mMessageBuffer = direction + " " + message_name + "\n";
-
-	//include the agentdata block with our agentid and sessionid automagically
-	if(include_agent_boilerplate)
-		mMessageBuffer += "[AgentData]\nAgentID = $AgentID\nSessionID = $SessionID\n";
-}
-
-void LLEasyMessageSender::luaClearMessage()
-{
-	mMessageBuffer = "";
-}
-
-void LLEasyMessageSender::luaAddBlock(const std::string& blockname)
-{
-	mMessageBuffer += "[" + blockname + "]\n";
-}
-
-void LLEasyMessageSender::luaAddField(const std::string& name, const std::string& value)
-{
-	mMessageBuffer += name + " = " + value + "\n";
-}
-
-void LLEasyMessageSender::luaAddHexField(const std::string& name, const std::string& value)
-{
-	mMessageBuffer += name + " =| " + value + "\n";
-}
-
-// static
 BOOL LLEasyMessageSender::addField(e_message_variable_type var_type, const char* var_name, std::string input, BOOL hex)
 {
 	LLStringUtil::trim(input);
@@ -625,9 +559,12 @@ BOOL LLEasyMessageSender::addField(e_message_variable_type var_type, const char*
 	return FALSE;
 }
 
+/*virtual*/
 void LLEasyMessageSender::printError(const std::string& error)
 {
-	LLFloaterChat::addChat(LLChat(llformat("Easy Message Sender Error: %s", error.c_str())));
+	LLSD args;
+	args["MESSAGE"] = error;
+	LLNotificationsUtil::add("GenericAlert", args);
 }
 
 //convert a message variable type to it's string representation
