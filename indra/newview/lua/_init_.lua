@@ -12,20 +12,24 @@
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
 
   0. You just DO WHAT THE FUCK YOU WANT TO. 
- --]]
- 
- --load lua library files for scripts to use.
- require "libhook"
- 
- print "Registering Hooks"
- registerHook("OnAgentInit", "This is called when the Agent and World has been loaded. This also indicates when World related bindings have been loaded.")
- registerHook("OnTick", "Called every frame")
- function printTable(x)
-	print("Printing tables")
+--]]
+
+--load lua library files for scripts to use.
+require "libhook"
+
+print "Registering Hooks"
+registerHook("OnAgentInit", "This is called when the Agent and World has been loaded. This also indicates when World related bindings have been loaded.")
+registerHook("OnTick", "Called every frame")
+function printMessage(x)
 	for k,v in pairs(x) do
-		print(k,v)
+		print('['..k..']')
+		for _,y in ipairs(v) do
+			for a,b in pairs(y) do
+				print(a..' = '..b)
+			end
+		end
 	end
 end
- setHook("OnAgentInit", function() print "OnAgentInit" end)
- 
- print "Initialization done."
+--setHook("OnAgentInit", function() print "OnAgentInit" end)
+
+print "Initialization done."
