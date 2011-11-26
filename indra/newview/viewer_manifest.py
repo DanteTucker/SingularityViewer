@@ -73,10 +73,12 @@ class ViewerManifest(LLManifest):
             self.path("*.ttf")
             self.path("*.txt")
             self.end_prefix("fonts")
-		# lua
-		if self.prefix(src="lua"):
-			self.path("*.lua")
-		
+
+        # lua
+        if self.prefix(src="lua"):
+            self.path("*.lua")
+            self.end_prefix("lua")
+
         # skins
         if self.prefix(src="skins"):
                 self.path("paths.xml")
