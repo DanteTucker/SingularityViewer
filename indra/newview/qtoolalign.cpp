@@ -79,16 +79,13 @@ BOOL QToolAlign::handleDoubleClick(S32 x, S32 y, MASK mask)
 
 LLTool* QToolAlign::getOverrideTool(MASK mask)
 {
-	if (!gKeyboard->getKeyDown('A'))
+	if (mask == MASK_CONTROL)
 	{
-		if (mask == MASK_CONTROL)
-		{
-			return LLToolCompRotate::getInstance();
-		}
-		else if (mask == (MASK_CONTROL | MASK_SHIFT))
-		{
-			return LLToolCompScale::getInstance();
-		}
+		return LLToolCompRotate::getInstance();
+	}
+	else if (mask == (MASK_CONTROL | MASK_SHIFT))
+	{
+		return LLToolCompScale::getInstance();
 	}
 	return LLToolComposite::getOverrideTool(mask);
 }

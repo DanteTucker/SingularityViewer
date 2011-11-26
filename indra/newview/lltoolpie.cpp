@@ -197,7 +197,6 @@ BOOL LLToolPie::pickAndShowMenu(BOOL always_show)
 				}
 			}
 		}
-		return TRUE;
 	}
 	// </edit>
 

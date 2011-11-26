@@ -450,6 +450,10 @@ void set_current_pose(std::string anim)
 	{
 		on_pose_stand = true;
 		gSavedSettings.setF32("AscentAvatarZModifier", gSavedSettings.getF32("AscentAvatarZModifier") + 7.5);
+		gAgent.setControlFlags(AGENT_CONTROL_SIT_ON_GROUND);
+		send_agent_update(TRUE);
+		gAgent.setPhantom(TRUE);
+
 	}
 
 	gAgent.sendAnimationRequest(current_pose, ANIM_REQUEST_STOP);
@@ -468,6 +472,9 @@ void handle_pose_stand_stop(void*)
 		on_pose_stand = false;
 		gAgent.sendAnimationRequest(current_pose, ANIM_REQUEST_STOP);
 		current_pose = LLUUID::null;
+		gAgent.setPhantom(FALSE);
+		gAgent.setControlFlags(AGENT_CONTROL_STAND_UP);
+		send_agent_update(TRUE);
 	}
 }
 void cleanup_pose_stand(void)

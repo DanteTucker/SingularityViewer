@@ -113,6 +113,8 @@ void LLLuaEngine::initSingleton()
 		LUA_ERROR("Failed to load: " << filename << " " << getError());
 		return;
 	}
+
+	mLoadedFully = true;
 }
 
 void LLLuaEngine::doString(const std::string& s)
@@ -164,6 +166,8 @@ void LLLuaEngine::callHook(const std::string &hook_name, const std::vector< std:
 	if(!LLLuaEngine::instanceExists()) return; //dont hook if lua isnt up and running
 
 	LLLuaEngine &self = instance();
+
+	if(!self.mLoadedFully) return;
 
 	lua_getglobal(self.mState, "callHook");
 	lua_pushstring(self.mState, hook_name.c_str());

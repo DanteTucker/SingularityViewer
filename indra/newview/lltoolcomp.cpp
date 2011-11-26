@@ -283,20 +283,13 @@ BOOL LLToolCompTranslate::handleMouseUp(S32 x, S32 y, MASK mask)
 
 LLTool* LLToolCompTranslate::getOverrideTool(MASK mask)
 {
-	if (gKeyboard->getKeyDown('A') && mask & MASK_CONTROL)
+	if (mask == MASK_CONTROL)
 	{
-		return QToolAlign::getInstance();
+		return LLToolCompRotate::getInstance();
 	}
-	else 
+	else if (mask == (MASK_CONTROL | MASK_SHIFT))
 	{
-		if (mask == MASK_CONTROL)
-		{
-			return LLToolCompRotate::getInstance();
-		}
-		else if (mask == (MASK_CONTROL | MASK_SHIFT))
-		{
-			return LLToolCompScale::getInstance();
-		}
+		return LLToolCompScale::getInstance();
 	}
 	return LLToolComposite::getOverrideTool(mask);
 }
@@ -409,11 +402,7 @@ BOOL LLToolCompScale::handleMouseUp(S32 x, S32 y, MASK mask)
 
 LLTool* LLToolCompScale::getOverrideTool(MASK mask)
 {
-	if (gKeyboard->getKeyDown('A') && mask & MASK_CONTROL)
-	{
-		return QToolAlign::getInstance();
-	}
-	else if (mask == MASK_CONTROL)
+	if (mask == MASK_CONTROL)
 	{
 		return LLToolCompRotate::getInstance();
 	}
@@ -612,11 +601,7 @@ BOOL LLToolCompRotate::handleMouseUp(S32 x, S32 y, MASK mask)
 
 LLTool* LLToolCompRotate::getOverrideTool(MASK mask)
 {
-	if (gKeyboard->getKeyDown('A') && mask & MASK_CONTROL)
-	{
-		return QToolAlign::getInstance();
-	}
-	else if (mask == (MASK_CONTROL | MASK_SHIFT))
+	if (mask == (MASK_CONTROL | MASK_SHIFT))
 	{
 		return LLToolCompScale::getInstance();
 	}

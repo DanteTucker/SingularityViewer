@@ -81,6 +81,8 @@ class LLLuaEngine : public LLSingleton<LLLuaEngine>
 private:
 	bool mRegisteredBindings;
 
+	bool mLoadedFully;
+
 	LLLuaState mState; //master lua_State
 	LLLuaEngine();
 	/*virtual*/ void initSingleton();
