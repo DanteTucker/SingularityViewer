@@ -144,8 +144,6 @@ void LLLuaEngine::tick()
 		getInstance()->registerBindings();
 		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
 	}
-
-	LUA_HOOK("OnTick",LUA_ARGS_NONE);
 }
 
 void LLLuaEngine::registerBindings()

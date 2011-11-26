@@ -45,8 +45,6 @@ class ViewerManifest(LLManifest):
         self.exclude("*.svn*")
         self.path(src="../../scripts/messages/message_template.msg", dst="app_settings/message_template.msg")
         self.path(src="../../etc/message.xml", dst="app_settings/message.xml")
-        # include the entire lua folder
-		self.path(src="lua")
 
         if self.prefix(src="app_settings"):
             self.exclude("logcontrol.xml")
@@ -75,7 +73,10 @@ class ViewerManifest(LLManifest):
             self.path("*.ttf")
             self.path("*.txt")
             self.end_prefix("fonts")
-
+		# lua
+		if self.prefix(src="lua"):
+			self.path("*.lua")
+		
         # skins
         if self.prefix(src="skins"):
                 self.path("paths.xml")
