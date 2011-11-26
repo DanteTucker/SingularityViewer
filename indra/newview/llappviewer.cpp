@@ -2270,7 +2270,7 @@ bool LLAppViewer::initConfiguration()
 	// Set the name of the window
 	//
 #if LL_RELEASE_FOR_DOWNLOAD
-	gWindowTitle = gSecondLife + "-v5.8";
+	gWindowTitle = gSecondLife + "-v5.9";
 #elif LL_DEBUG
 	gWindowTitle = gSecondLife + std::string(" [DEBUG] ") + gArgs;
 #else
