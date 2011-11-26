@@ -222,6 +222,7 @@ LLFloaterAvatarList::LLFloaterAvatarList() :  LLFloater(std::string("radar"))
 	llassert_always(sInstance == NULL);
 	sInstance = this;
 	mUpdateRate = gSavedSettings.getU32("RadarUpdateRate") * 3 + 3;
+	mSoundTriggerConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_SoundTrigger, sound_trigger_hook);
 }
 
 LLFloaterAvatarList::~LLFloaterAvatarList()
@@ -1260,7 +1261,7 @@ void LLFloaterAvatarList::sendKeys()
         }
 }
 //static
-void LLFloaterAvatarList::sound_trigger_hook(LLMessageSystem* msg,void **)
+void LLFloaterAvatarList::sound_trigger_hook(LLMessageSystem* msg)
 {
 	LLUUID  sound_id,owner_id;
         msg->getUUIDFast(_PREHASH_SoundData, _PREHASH_SoundID, sound_id);

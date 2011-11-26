@@ -184,12 +184,12 @@ public:
 
 	static void lookAtAvatar(LLUUID &uuid);
 
-	static void sound_trigger_hook(LLMessageSystem* msg,void **);
+	static void sound_trigger_hook(LLMessageSystem* msg);
 	static void sendKeys();
 
 private:
 	static LLFloaterAvatarList* sInstance;
-
+	boost::signals2::connection mSoundTriggerConnection;
 public:
 	static LLFloaterAvatarList* getInstance() { return sInstance; }
 private:

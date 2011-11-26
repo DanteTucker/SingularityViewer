@@ -3616,7 +3616,6 @@ void LLAppViewer::idle()
 
 	LLFrameTimer::updateFrameTimeAndCount();
 	LLEventTimer::updateClass();
-	LLLuaEngine::tick();
 	LLCriticalDamp::updateInterpolants();
 	LLMortician::updateClass();
 

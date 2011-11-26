@@ -7,6 +7,7 @@
 #include "llviewercontrol.h"
 #include "lleasymessagesender.h"
 #include "llstartup.h"
+#include "llcallbacklist.h"
 
 static std::string LuaPrintStrings(lua_State* L)
 { 
@@ -81,6 +82,75 @@ LLLuaEngine::LLLuaEngine()
 {
 }
 
+LLLuaTable::LLLuaTable(lua_State* L)
+	:K(false),
+	 C(1)
+{
+	lua_newtable(L);
+}
+
+void LLLuaTable::pushkeystring(lua_State* L, const char* s)
+{
+	K = true;
+	lua_pushstring(L, s);
+}
+void LLLuaTable::pushvalue(lua_State* L, const char* s)
+{
+	lua_pushstring(L, s);
+	push(L);
+}
+void LLLuaTable::pushvalue(lua_State* L, lua_Number s)
+{
+	lua_pushnumber(L, s);
+	push(L);
+}
+void LLLuaTable::push(lua_State* L)
+{
+	if(K)
+		lua_rawset(L, -3);
+	else
+		lua_rawseti(L, -2, C++);
+	K=false;
+}
+
+//static
+void LLLuaTable::make_table(lua_State* L, const std::vector< std::string > vec)
+{
+	LLLuaTable table(L);
+	for(auto itr = vec.begin(); itr != vec.end(); itr++)
+		table.pushvalue(L, (*itr).c_str());
+}
+
+//static
+void LLLuaTable::make_table(lua_State* L, const std::vector< lua_Number > vec)
+{
+	LLLuaTable table(L);
+	for(auto itr = vec.begin(); itr != vec.end(); itr++)
+		table.pushvalue(L, (*itr));
+}
+
+//static
+void LLLuaTable::make_table(lua_State* L, const std::map< std::string, std::string > map)
+{
+	LLLuaTable table(L);
+	for(auto itr = map.begin(); itr != map.end(); itr++)
+	{
+		table.pushkeystring(L, itr->first.c_str());
+		table.pushvalue(L, itr->second.c_str());
+	}
+}
+
+//static
+void LLLuaTable::make_table(lua_State* L, const std::map< std::string, lua_Number > map)
+{
+	LLLuaTable table(L);
+	for(auto itr = map.begin(); itr != map.end(); itr++)
+	{
+		table.pushkeystring(L, itr->first.c_str());
+		table.pushvalue(L, itr->second);
+	}
+}
+
 static int luaOnPanic(lua_State *L)
 {	
 	LUA_ERROR("PANIC: " << lua_tostring(L, -1));
@@ -115,6 +185,8 @@ void LLLuaEngine::initSingleton()
 	}
 
 	mLoadedFully = true;
+
+	gIdleCallbacks.addFunction(LLLuaEngine::tick, NULL);
 }
 
 void LLLuaEngine::doString(const std::string& s)
@@ -134,7 +206,7 @@ void LLLuaEngine::console(const std::string & s)
 }
 
 //static
-void LLLuaEngine::tick()
+void LLLuaEngine::tick(void* userdata)
 {
 	if(!LLLuaEngine::instanceExists()) return; //so the tick doesnt happen till we are up and running
 

@@ -44,35 +44,15 @@ class LLLuaTable
 	bool K;
 	unsigned int C;
 public:
-	LLLuaTable(lua_State* L)
-		:K(false),
-		 C(1)
-	{
-		lua_newtable(L);
-	}
-	void pushkeystring(lua_State* L, const char* s)
-	{
-		K = true;
-		lua_pushstring(L, s);
-	}
-	void pushvalue(lua_State* L, const char* s)
-	{
-		lua_pushstring(L, s);
-		push(L);
-	}
-	void pushvalue(lua_State* L, lua_Number s)
-	{
-		lua_pushnumber(L, s);
-		push(L);
-	}
-	void push(lua_State* L)
-	{
-		if(K)
-			lua_rawset(L, -3);
-		else
-			lua_rawseti(L, -2, C++);
-		K=false;
-	}
+	LLLuaTable(lua_State* L);
+	static void make_table(lua_State* L, const std::vector< std::string > vec);
+	static void make_table(lua_State* L, const std::vector< lua_Number > vec);
+	static void make_table(lua_State* L, const std::map< std::string, std::string > map);
+	static void make_table(lua_State* L, const std::map< std::string, lua_Number > map);
+	void pushkeystring(lua_State* L, const char* s);
+	void pushvalue(lua_State* L, const char* s);
+	void pushvalue(lua_State* L, lua_Number s);
+	void push(lua_State* L);
 };
 
 class LLLuaEngine : public LLSingleton<LLLuaEngine>
@@ -87,7 +67,7 @@ private:
 	LLLuaEngine();
 	/*virtual*/ void initSingleton();
 public:	
-	static void tick(); //ticks every frame
+	static void tick(void* userdata); //ticks every frame
 	static void callHook(const std::string& hook_name,const std::vector< std::string > &args);
 
 	lua_State* getLuaState() { return mState; }
