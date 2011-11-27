@@ -230,6 +230,203 @@ int LunaMessageHandler::setHandler(lua_State* L)
 	return 0;
 }
 
+static void variable_table_push(lua_State* L, LLMessageSystem *msg, const char* block_name, const int block_num, LLLuaTable &block_variable_table, LLMessageVariable* variable)
+{
+	const char* var_name = variable->getName();
+	block_variable_table.pushkeystring(L, var_name);
+
+	switch(variable->getType())
+	{
+	case MVT_U8:
+		{
+			U8 value;
+			msg->getU8Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_U16:
+		{
+			U16 value;
+			msg->getU16Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_U32:
+		{
+			U32 value;
+			msg->getU32Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_U64:
+		{
+			U64 value;
+			msg->getU64Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_S8:
+		{
+			S8 value;
+			msg->getS8Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_S16:
+		{
+			S16 value;
+			msg->getS16Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_S32:
+		{
+			S32 value;
+			msg->getS32Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_F32:
+		{
+			F32 value;
+			msg->getF32Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_F64:
+		{
+			F64 value;
+			msg->getF64Fast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_LLVector3:
+		{
+			LLVector3 value;
+			msg->getVector3Fast(block_name, var_name, value, block_num);
+			LLLuaTable vector(L);
+			for(int i = 0; i < 3; i++)
+			{
+				vector.pushvalue(L, value.mV[i]);
+			}
+			block_variable_table.push(L);
+		}
+		break;
+	case MVT_LLVector3d:
+		{
+			LLVector3d value;
+			msg->getVector3dFast(block_name, var_name, value, block_num);
+			LLLuaTable vector(L);
+			for(int i = 0; i < 3; i++)
+			{
+				vector.pushvalue(L, value.mdV[i]);
+			}
+			block_variable_table.push(L);
+		}
+		break;
+	case MVT_LLVector4:
+		{
+			LLVector4 value;
+			msg->getVector4Fast(block_name, var_name, value, block_num);
+			LLLuaTable vector(L);
+			for(int i = 0; i < 4; i++)
+			{
+				vector.pushvalue(L, value.mV[i]);
+			}
+			block_variable_table.push(L);
+		}
+		break;
+	case MVT_LLQuaternion:
+		{
+			LLQuaternion value;
+			msg->getQuatFast(block_name, var_name, value, block_num);
+			LLLuaTable quat(L);
+			for(int i = 0; i < 4; i++)
+			{
+				quat.pushvalue(L, value.mQ[i]);
+			}
+			block_variable_table.push(L);
+		}
+		break;
+	case MVT_LLUUID:
+		{
+			LLUUID value;
+			msg->getUUIDFast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value.asString().c_str());
+		}
+		break;
+	case MVT_BOOL:
+		{
+			BOOL value;
+			msg->getBOOLFast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+		break;
+	case MVT_IP_ADDR:
+		{
+			U32 value;
+			msg->getIPAddrFast(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, LLHost(value, 0).getIPString().c_str());
+		}
+		break;
+	case MVT_IP_PORT:
+		{
+			U16 value;
+			msg->getIPPort(block_name, var_name, value, block_num);
+			block_variable_table.pushvalue(L, value);
+		}
+	case MVT_VARIABLE:
+	case MVT_FIXED:
+	default:
+		{
+			S32 size = msg->getSize(block_name, block_num, var_name);
+			if(size)
+			{
+				std::ostringstream stream;
+				char* value = new char[size + 1];
+				msg->getBinaryDataFast(block_name, var_name, value, size, block_num);
+				value[size] = '\0';
+				S32 readable = 0;
+				S32 unreadable = 0;
+				for(S32 i = 0; i < size; i++)
+				{
+					if(!value[i])
+					{
+						if(i != (size - 1))
+						{ // don't want null terminator hiding data
+							unreadable = S32_MAX;
+							break;
+						}
+					}
+					else if(value[i] < 0x20 || value[i] >= 0x7F)
+					{
+						unreadable = S32_MAX;
+						break;
+					}
+					else readable++;
+				}
+				if(readable >= unreadable)
+				{
+					stream << value;
+				
+					delete[] value;
+				}
+				else
+				{
+					for(S32 i = 0; i < size; i++)
+						stream << llformat("%02X ", (U8)value[i]);
+				}
+				block_variable_table.pushvalue(L, stream.str().c_str());
+			}
+			else
+			{
+				block_variable_table.pushvalue(L,""); //empty string
+			}
+		}
+		break;
+	} //end switch
+}
+
 void LunaMessageHandler::slot_func(LLMessageSystem* msg)
 {
 	if(!LLLuaEngine::instanceExists())
@@ -266,200 +463,7 @@ void LunaMessageHandler::slot_func(LLMessageSystem* msg)
 					for (LLMessageBlock::message_variable_map_t::iterator var_iter = block->mMemberVariables.begin();
 							var_iter != var_end; ++var_iter)
 					{
-						LLMessageVariable* variable = (*var_iter);
-						const char* var_name = variable->getName();
-						block_variable_table.pushkeystring(L, var_name);
-
-						switch(variable->getType())
-						{
-						case MVT_U8:
-							{
-								U8 value;
-								msg->getU8Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_U16:
-							{
-								U16 value;
-								msg->getU16Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_U32:
-							{
-								U32 value;
-								msg->getU32Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_U64:
-							{
-								U64 value;
-								msg->getU64Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_S8:
-							{
-								S8 value;
-								msg->getS8Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_S16:
-							{
-								S16 value;
-								msg->getS16Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_S32:
-							{
-								S32 value;
-								msg->getS32Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_F32:
-							{
-								F32 value;
-								msg->getF32Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_F64:
-							{
-								F64 value;
-								msg->getF64Fast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_LLVector3:
-							{
-								LLVector3 value;
-								msg->getVector3Fast(block_name, var_name, value, block_num);
-								LLLuaTable vector(L);
-								for(int i = 0; i < 3; i++)
-								{
-									vector.pushvalue(L, value.mV[i]);
-								}
-								block_variable_table.push(L);
-							}
-							break;
-						case MVT_LLVector3d:
-							{
-								LLVector3d value;
-								msg->getVector3dFast(block_name, var_name, value, block_num);
-								LLLuaTable vector(L);
-								for(int i = 0; i < 3; i++)
-								{
-									vector.pushvalue(L, value.mdV[i]);
-								}
-								block_variable_table.push(L);
-							}
-							break;
-						case MVT_LLVector4:
-							{
-								LLVector4 value;
-								msg->getVector4Fast(block_name, var_name, value, block_num);
-								LLLuaTable vector(L);
-								for(int i = 0; i < 4; i++)
-								{
-									vector.pushvalue(L, value.mV[i]);
-								}
-								block_variable_table.push(L);
-							}
-							break;
-						case MVT_LLQuaternion:
-							{
-								LLQuaternion value;
-								msg->getQuatFast(block_name, var_name, value, block_num);
-								LLLuaTable quat(L);
-								for(int i = 0; i < 4; i++)
-								{
-									quat.pushvalue(L, value.mQ[i]);
-								}
-								block_variable_table.push(L);
-							}
-							break;
-						case MVT_LLUUID:
-							{
-								LLUUID value;
-								msg->getUUIDFast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value.asString().c_str());
-							}
-							break;
-						case MVT_BOOL:
-							{
-								BOOL value;
-								msg->getBOOLFast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-							break;
-						case MVT_IP_ADDR:
-							{
-								U32 value;
-								msg->getIPAddrFast(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, LLHost(value, 0).getIPString().c_str());
-							}
-							break;
-						case MVT_IP_PORT:
-							{
-								U16 value;
-								msg->getIPPort(block_name, var_name, value, block_num);
-								block_variable_table.pushvalue(L, value);
-							}
-						case MVT_VARIABLE:
-						case MVT_FIXED:
-						default:
-							{
-								S32 size = msg->getSize(block_name, block_num, var_name);
-								if(size)
-								{
-									std::ostringstream stream;
-									char* value = new char[size + 1];
-									msg->getBinaryDataFast(block_name, var_name, value, size, block_num);
-									value[size] = '\0';
-									S32 readable = 0;
-									S32 unreadable = 0;
-									for(S32 i = 0; i < size; i++)
-									{
-										if(!value[i])
-										{
-											if(i != (size - 1))
-											{ // don't want null terminator hiding data
-												unreadable = S32_MAX;
-												break;
-											}
-										}
-										else if(value[i] < 0x20 || value[i] >= 0x7F)
-										{
-											unreadable = S32_MAX;
-											break;
-										}
-										else readable++;
-									}
-									if(readable >= unreadable)
-									{
-										stream << value;
-				
-										delete[] value;
-									}
-									else
-									{
-										for(S32 i = 0; i < size; i++)
-											stream << llformat("%02X ", (U8)value[i]);
-									}
-									block_variable_table.pushvalue(L, stream.str().c_str());
-								}
-								else
-								{
-									block_variable_table.pushvalue(L,""); //empty string
-								}
-							}
-							break;
-						} //end switch
+						variable_table_push(L, msg, block_name, block_num, block_variable_table, (*var_iter));
 					}
 					block_table.push(L);
 				}
@@ -479,7 +483,12 @@ void LunaMessageHandler::slot_func(LLMessageSystem* msg)
 
 int LunaMessageHandler::connect(lua_State* L)
 {
-	const char* lua_name = luaL_checkstring(L, 2); //do not delete.
+	int nArgs = lua_gettop(L)-1; //element 1 is the table we are in.
+	const char* lua_name = luaL_checkstring(L, 2);
+	bool lua_inbound = false;
+	if(nArgs >= 2)
+		lua_inbound = lua_toboolean(L, 3);
+	lua_inbound = lua_toboolean(L, 3);
 	std::map<const char *, LLMessageTemplate*>::iterator template_iter;
 	const char* message_name = LLMessageStringTable::getInstance()->getString(lua_name);
 	template_iter = gMessageSystem->mMessageTemplates.find( message_name );
@@ -489,7 +498,14 @@ int LunaMessageHandler::connect(lua_State* L)
 		return 0;
 	}
 	mMessageTemplate = template_iter->second;
-	mMessageConnection = gMessageSystem->addHandlerFuncFast(message_name, boost::bind(&LunaMessageHandler::slot_func,this,_1));
+	if(lua_inbound)
+	{
+		mMessageConnection = gMessageSystem->addHandlerFuncFast(message_name, boost::bind(&LunaMessageHandler::slot_func,this,_1));
+	}
+	else
+	{
+		LUA_ERROR("inbound is not implemented yet");
+	}
 	return 0;
 }
 
