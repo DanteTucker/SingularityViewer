@@ -65,6 +65,7 @@ private:
 
 	LLLuaState mState; //master lua_State
 	LLLuaEngine();
+	~LLLuaEngine();
 	/*virtual*/ void initSingleton();
 public:	
 	static void tick(void* userdata); //ticks every frame
@@ -78,5 +79,7 @@ public:
 	void registerBindings();
 	const std::string getError();
 };
+
+extern void dump_stack (lua_State *L);
 
 #endif

@@ -6,33 +6,6 @@
 #include "llluabindings.h" //includes all lua headers needed.
 #include "llagent.h"
 
-static void dump_stack (lua_State *L) {
-      int i;
-      int top = lua_gettop(L);
-      for (i = 1; i <= top; i++) {  /* repeat for each level */
-        int t = lua_type(L, i);
-        switch (t) {
-    
-          case LUA_TSTRING:  /* strings */
-            LL_INFOS("STACK") << llformat("`%s'", lua_tostring(L, i)) << LL_ENDL;
-            break;
-    
-          case LUA_TBOOLEAN:  /* booleans */
-            LL_INFOS("STACK") << llformat(lua_toboolean(L, i) ? "true" : "false") << LL_ENDL;
-            break;
-    
-          case LUA_TNUMBER:  /* numbers */
-            LL_INFOS("STACK") << llformat("%g", lua_tonumber(L, i)) << LL_ENDL;
-            break;
-    
-          default:  /* other values */
-            LL_INFOS("STACK") << llformat("%s", lua_typename(L, t)) << LL_ENDL;
-            break;
-    
-        }
-      }
-    }
-
 // implementation of Luna stuff
 const char LunaMessageBuilder::className[] = "MessageBuilder";
 const Luna < LunaMessageBuilder >::PropertyType LunaMessageBuilder::Properties[] = {
@@ -56,13 +29,10 @@ int LunaMessageBuilder::SendRawMessage(lua_State* L)
 	bool ret = false;
 	if(nArgs >= 2)
 	{
-		if(!lua_isnil(L,i) && lua_isstring(L,i))
-		{
-			region_host.assign(lua_tostring(L, i));
-		}
+		region_host.assign(luaL_checkstring(L, i));
 		i++;
 	}
-	std::string message(luaL_checklstring(L,i, NULL));
+	std::string message(luaL_checkstring(L,i));
 	mMessageBuffer = "";
 
 	LLHost proper_region_host = LLHost(region_host);
@@ -101,10 +71,7 @@ int LunaMessageBuilder::NewMessage(lua_State* L)
 			boiler_plate = lua_toboolean(L,4);
 		}
 	case 2:
-		if(!lua_isnil(L,2) && !lua_isnil(L,3))
-			luaNewMessage(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)), boiler_plate);
-		else
-			LUA_ERRORED("NewMessage");
+		luaNewMessage(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)), boiler_plate);
 		break;
 	default:
 		LUA_ERRORED("NewMessage");
@@ -118,10 +85,7 @@ int LunaMessageBuilder::AddBlock(lua_State* L)
 	switch(nArgs)
 	{
 	case 1:
-		if(!lua_isnil(L,2))
-			luaAddBlock(std::string(luaL_checklstring(L,2,NULL)));
-		else
-			LUA_ERRORED("AddField");
+		luaAddBlock(std::string(luaL_checklstring(L,2,NULL)));
 		break;
 	default:
 		LUA_ERRORED("AddField");
@@ -135,10 +99,7 @@ int LunaMessageBuilder::AddField(lua_State* L)
 	switch(nArgs)
 	{
 	case 2:
-		if(!lua_isnil(L,2) && !lua_isnil(L,3))
-			luaAddField(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)));
-		else
-			LUA_ERRORED("AddField");
+		luaAddField(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)));
 		break;
 	default:
 		LUA_ERRORED("AddField");
@@ -152,10 +113,7 @@ int LunaMessageBuilder::AddHexField(lua_State* L)
 	switch(nArgs)
 	{
 	case 2:
-		if(!lua_isnil(L,2) && !lua_isnil(L,3))
-			luaAddHexField(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)));
-		else
-			LUA_ERRORED("AddHexField");
+		luaAddHexField(std::string(luaL_checklstring(L,2,NULL)),std::string(luaL_checklstring(L,3,NULL)));
 		break;
 	default:
 		LUA_ERRORED("AddHexField");
@@ -210,12 +168,16 @@ const Luna < LunaMessageHandler >::FunctionType LunaMessageHandler::Functions[] 
 
 LunaMessageHandler::LunaMessageHandler(lua_State* L)
 {
-	//TODO: connect on creation if there are the right parameters
-	setHandler(L);
+	if(lua_isfunction(L, 1))
+	{
+		mFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
+		connect(L);
+	}
 }
 
 LunaMessageHandler::~LunaMessageHandler()
 {
+
 }
 
 int LunaMessageHandler::setHandler(lua_State* L)
@@ -478,7 +440,7 @@ void LunaMessageHandler::slot_func(LLMessageSystem* msg)
 	{
 		LUA_ERRORED("LunaMessageHandler");
 	}
-	LL_INFOS(LunaMessageHandler::className) << "called message handler bootstrap" << LL_ENDL;
+	//LL_INFOS(LunaMessageHandler::className) << "called message handler bootstrap" << LL_ENDL;
 }
 
 int LunaMessageHandler::connect(lua_State* L)
@@ -489,6 +451,7 @@ int LunaMessageHandler::connect(lua_State* L)
 	if(nArgs >= 2)
 		lua_inbound = lua_toboolean(L, 3);
 	lua_inbound = lua_toboolean(L, 3);
+
 	std::map<const char *, LLMessageTemplate*>::iterator template_iter;
 	const char* message_name = LLMessageStringTable::getInstance()->getString(lua_name);
 	template_iter = gMessageSystem->mMessageTemplates.find( message_name );
@@ -513,4 +476,66 @@ int LunaMessageHandler::disconnect(lua_State* L)
 {
 	mMessageConnection.disconnect();
 	return 0;
+}
+
+// implementation of Luna stuff
+const char LunaChatCommand::className[] = "ChatCommand";
+const Luna < LunaChatCommand >::PropertyType LunaChatCommand::Properties[] = {
+	{0}
+};
+const Luna < LunaChatCommand >::FunctionType LunaChatCommand::Functions[] = {
+	{"delete", &LunaChatCommand::deleteme},
+	{0}
+};
+
+LunaChatCommand::LunaChatCommand(lua_State* L)
+	:CmdLineChatCommand(luaL_checkstring(L,1)),
+	mDisconnected(false)
+{
+	if(lua_isfunction(L, 2))
+	{
+		lua_pushvalue(L, 2);
+		mFuncRef = luaL_ref(L, LUA_REGISTRYINDEX);
+	}
+}
+LunaChatCommand::~LunaChatCommand()
+{
+	if(LLLuaEngine::instanceExists() || mFuncRef != LUA_NOREF)
+	{
+		luaL_unref(LLLuaEngine::getInstance()->getLuaState(), LUA_REGISTRYINDEX, mFuncRef);
+	}
+}
+
+int LunaChatCommand::deleteme(lua_State* L)
+{
+	mDisconnected = true;
+	return 0;
+}
+
+bool LunaChatCommand::execute(const std::string& text)
+{
+	if(mDisconnected) return false; //we do not want anymore.
+	if(!LLLuaEngine::instanceExists() || mFuncRef == LUA_NOREF) return false;
+
+	lua_State* L = LLLuaEngine::getInstance()->getLuaState();
+	
+	//get function pointer
+	lua_rawgeti(L, LUA_REGISTRYINDEX, mFuncRef);
+
+	U32 count = 0;
+	std::istringstream i(text);
+	std::string temp;
+	while(i >> temp)
+	{
+		count++;
+		lua_pushstring(L, temp.c_str());
+	}
+	
+	//call lua function
+	if(lua_pcall(L, count, 0, 0))
+	{
+		LUA_ERRORED("LunaChatCommand");
+	}
+
+	return true; //we loved it.
 }

@@ -67,6 +67,5 @@ private:
 	bool mIsDirty;
 
 	static SLFloaterMediaFilter* sInstance;
-
 };
 #endif

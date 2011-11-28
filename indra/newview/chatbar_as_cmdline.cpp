@@ -88,7 +88,34 @@ LLViewerInventoryItem::item_array_t findInventoryInFolder(const std::string& ifo
 	return items;
 }
 
-class JCZface : public LLEventTimer
+CmdLineChatCommand::CmdLineChatCommand(const std::string& cmd)
+	:mCommandName(cmd)
+{
+}
+
+CmdLineChatCommand::~CmdLineChatCommand()
+{
+}
+
+bool CmdLineChatCommand::ExecuteClass(const std::string& revised_text, EChatType type)
+{
+	std::istringstream i(revised_text);
+		std::string command;
+		i >> command;
+		command = utf8str_tolower(command);
+	for(auto itr = beginInstances(); itr != endInstances(); itr++)
+	{
+		if(utf8str_tolower((*itr).mCommandName) == command)
+		{
+			const std::string text = revised_text.substr(command.size() +
+					(revised_text.size() <= command.size() ? 0 : 1), revised_text.size());
+			return (*itr).execute(text);
+		}
+	}
+	return false;
+}
+
+/*class JCZface : public LLEventTimer
 {
 public:
 	JCZface(std::stack<LLViewerInventoryItem*> stack, LLUUID dest, F32 pause) : LLEventTimer( pause )
@@ -188,7 +215,7 @@ public:
 private:
 	std::set<U32> done_prims;
 	
-};
+};*/
 
 void invrepair()
 {
@@ -207,12 +234,8 @@ bool stort_calls(const std::pair<std::string, U32>& left, const std::pair<std::s
 	return left.second < right.second;
 }
 #endif //PROF_CTRL_CALLS
-#if LL_DARWIN || LL_LINUX //Unix systems think easier
 #define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	v(n,d)
-#else
-#define CACHEDCONTROL_CMD(v,n,d) static const LLCachedControl<std::string>	##v(n,d)
-#endif
-bool cmd_line_chat(std::string revised_text, EChatType type)
+bool cmd_line_chat(const std::string& revised_text, EChatType type)
 {
 	static const LLCachedControl<bool> sAscentCmdLine("AscentCmdLine",false);
 	CACHEDCONTROL_CMD(sAscentCmdLinePos,"AscentCmdLinePos","gtp");
@@ -227,6 +250,8 @@ bool cmd_line_chat(std::string revised_text, EChatType type)
 	CACHEDCONTROL_CMD(sAscentCmdLineMapTo,"AscentCmdLineMapTo","mapto");
 	CACHEDCONTROL_CMD(sAscentCmdLineCalc,"AscentCmdLineCalc","calc");
 	CACHEDCONTROL_CMD(sAscentCmdLineClearChat,"AscentCmdLineClearChat","clr");
+
+	if(CmdLineChatCommand::ExecuteClass(revised_text, type)) return false;
 
 	if(sAscentCmdLine)
 	{
