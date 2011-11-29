@@ -53,6 +53,7 @@
 #include "lloverlaybar.h"
 #include "slfloatermediafilter.h"
 
+#include <boost/regex.hpp>
 // Static Variables
 
 S32 LLViewerParcelMedia::sMediaParcelLocalID = 0;
@@ -64,6 +65,7 @@ LLSD LLViewerParcelMedia::sMediaFilterList;
 std::set<std::string> LLViewerParcelMedia::sMediaQueries;
 std::set<std::string> LLViewerParcelMedia::sAllowedMedia;
 std::set<std::string> LLViewerParcelMedia::sDeniedMedia;
+std::map<std::string, std::string> LLViewerParcelMedia::sDNSlookups;
 
 // Local functions
 bool callback_play_media(const LLSD& notification, const LLSD& response, LLParcel* parcel);
@@ -1054,4 +1056,40 @@ std::string LLViewerParcelMedia::extractDomain(std::string url)
 	last_region = gAgent.getRegion()->getHost().getHostName();
 
 	return url;
+}
+
+//static
+std::string LLViewerParcelMedia::getDomainIP(const std::string& domain, bool force)
+{
+	std::string ip = domain;	// default for no lookups or IP domains
+
+	// Check to see if the domain is already an IP
+	boost::regex ipv4_format("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+	boost::regex ipv6_format("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+	if (boost::regex_match(domain, ipv4_format) ||
+		boost::regex_match(domain, ipv6_format))
+	{
+		return ip;
+	}
+
+	// The domain is a name, not an IP. Make a DNS lookup.
+	std::map<std::string, std::string>::iterator it = sDNSlookups.find(domain);
+	if (it != sDNSlookups.end())
+	{
+		ip = it->second;
+	}
+	else if (force || gSavedSettings.getBOOL("MediaLookupIP"))
+	{
+		// Lookup the domain to get its IP.
+		// This incurs a short pause (one second or so) on succesful lookups
+		// and a long pause (several seconds) on failing lookups (bad domain).
+		LLHost host;
+		host.setHostByName(domain);
+		ip = host.getIPString();
+
+		// Cache this (domain, ip) pair for later lookups
+		sDNSlookups.insert(std::pair<std::string, std::string>(domain, ip));
+	}
+
+	return ip;
 }

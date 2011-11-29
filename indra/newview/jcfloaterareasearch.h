@@ -57,11 +57,13 @@ public:
 
 	/*virtual*/ BOOL postBuild();
 	/*virtual*/ void close(bool app = false);
+	/*virtual*/ void draw();
 
-	static void results();
 	static void toggle();
 	static JCFloaterAreaSearch* getInstance() { return sInstance; }
 	static void processObjectPropertiesFamily(LLMessageSystem* msg);
+
+	static void setDirty() { sIsDirty = true; }
 
 private:
 	static void checkRegion();
@@ -82,6 +84,13 @@ private:
 	static JCFloaterAreaSearch* sInstance;
 
 	static S32 sRequested;
+
+	static bool sIsDirty;
+
+	static bool sTracking;
+	static LLUUID sTrackingObjectID;
+	static LLVector3d sTrackingLocation;
+	static std::string sTrackingInfoLine;
 
 	LLTextBox* mCounterText;
 	LLScrollListCtrl* mResultList;

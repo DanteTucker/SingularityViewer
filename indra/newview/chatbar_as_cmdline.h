@@ -33,4 +33,16 @@
 
 #include "llchatbar.h"
 
-bool cmd_line_chat(std::string revised_text, EChatType type);
+class CmdLineChatCommand : public LLInstanceTracker<CmdLineChatCommand>
+{
+	
+public:
+	CmdLineChatCommand(const std::string& cmd);
+	virtual ~CmdLineChatCommand();
+	virtual bool execute(const std::string& text) = 0;
+	static bool ExecuteClass(const std::string& revised_text, EChatType type);
+private:
+	std::string mCommandName;
+};
+
+extern bool cmd_line_chat(const std::string& revised_text, EChatType type);

@@ -22,11 +22,12 @@ local function addIfNotThere(HookName)
 	end
 end
 
-function setHook(HookName,Function)
+function setHookFunction(HookName,Function)
 	addIfNotThere(HookName)
 	table.insert(Hooks[HookName],Function)
 end
 
+-- DO NOT CHANGE THIS FUNCTION NAME UNLESS YOU CHANGE IT IN THE VIEWER TOO.
 function callHook(HookName,...)
 	if Hooks[HookName] == nil then return 0 end -- no hooks
 	local calls=0 -- for debugging

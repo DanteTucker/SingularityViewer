@@ -33,11 +33,12 @@
 
 #include "llviewerprecompiledheaders.h"
 
+#include "slfloatermediafilter.h"
+
 #include "lllineeditor.h"
 #include "llscrolllistctrl.h"
 #include "lluictrlfactory.h" 
 
-#include "slfloatermediafilter.h"
 #include "llviewercontrol.h"
 #include "llviewerparcelmedia.h"
 
@@ -79,6 +80,8 @@ BOOL SLFloaterMediaFilter::postBuild()
 
 void SLFloaterMediaFilter::draw()
 {
+	LLTimer update_timer;
+
 	if (mIsDirty && mWhitelistSLC && mBlacklistSLC)
 	{
 		S32 whitescrollpos = mWhitelistSLC->getScrollPos();
@@ -86,7 +89,6 @@ void SLFloaterMediaFilter::draw()
 		mWhitelistSLC->deleteAllItems();
 		mBlacklistSLC->deleteAllItems();
 		std::set<std::string> listed;
-		LLHost host;
 		std::string ip;
 		std::string domain;
 		std::string action;
@@ -96,10 +98,9 @@ void SLFloaterMediaFilter::draw()
 		for (S32 i = 0; i < (S32)LLViewerParcelMedia::sMediaFilterList.size(); i++)
 		{
 			domain = LLViewerParcelMedia::sMediaFilterList[i]["domain"].asString();
-			if (sShowIPs)
+			if (sShowIPs && update_timer.getElapsedTimeF32() < 1.0f)
 			{
-				host.setHostByName(domain);
-				ip = host.getIPString();
+				ip = LLViewerParcelMedia::getDomainIP(domain, true);
 				if (ip != domain && domain.find('/') == std::string::npos)
 				{
 					domain += " (" + ip + ")";
@@ -125,7 +126,8 @@ void SLFloaterMediaFilter::draw()
 			}
 			else
 			{
-				LL_WARNS("MediaFilter") << "Bad media filter list: removing corrupted entry for \"" << domain << "\"" << LL_ENDL;
+				LL_WARNS("MediaFilter") << "Bad media filter list: removing corrupted entry for \""
+										<< domain << "\"" << LL_ENDL;
 				LLViewerParcelMedia::sMediaFilterList.erase(i--);
 			}
 		}
@@ -134,13 +136,13 @@ void SLFloaterMediaFilter::draw()
 		element["columns"][0]["font-style"] = "ITALIC";
 		//element["columns"][0]["color"] = LLColor4::green3.getValue();
 		element["columns"][0]["column"] = "whitelist_col";
-		for (it = LLViewerParcelMedia::sAllowedMedia.begin(); it != LLViewerParcelMedia::sAllowedMedia.end(); it++)
+		for (it = LLViewerParcelMedia::sAllowedMedia.begin();
+			 it != LLViewerParcelMedia::sAllowedMedia.end(); it++)
 		{
 			domain = *it;
-			if (sShowIPs)
+			if (sShowIPs && update_timer.getElapsedTimeF32() < 1.0f)
 			{
-				host.setHostByName(domain);
-				ip = host.getIPString();
+				ip = LLViewerParcelMedia::getDomainIP(domain, true);
 				if (ip != domain && domain.find('/') == std::string::npos)
 				{
 					domain += " (" + ip + ")";
@@ -156,10 +158,9 @@ void SLFloaterMediaFilter::draw()
 		for (it = LLViewerParcelMedia::sDeniedMedia.begin(); it != LLViewerParcelMedia::sDeniedMedia.end(); it++)
 		{
 			domain = *it;
-			if (sShowIPs)
+			if (sShowIPs && update_timer.getElapsedTimeF32() < 1.0f)
 			{
-				host.setHostByName(domain);
-				ip = host.getIPString();
+				ip = LLViewerParcelMedia::getDomainIP(domain, true);
 				if (ip != domain && domain.find('/') == std::string::npos)
 				{
 					domain += " (" + ip + ")";
@@ -187,11 +188,20 @@ void SLFloaterMediaFilter::draw()
 			childDisable("match_ip");
 			childDisable("input_domain");
 			childDisable("commit_domain");
-			childSetText("add_text", std::string("****** WARNING: media filtering is currently DISABLED ******"));
+			childSetText("add_text", getString("disabled"));
 		}
 
-		mIsDirty = false;
-		sShowIPs = false;
+		if (sShowIPs)
+		{
+			if (update_timer.getElapsedTimeF32() < 1.0f)
+			{
+				mIsDirty = sShowIPs = false;
+			}
+		}
+		else
+		{
+			mIsDirty = false;
+		}
 	}
 
 	LLFloater::draw();
@@ -202,7 +212,6 @@ void SLFloaterMediaFilter::setDirty()
     if (sInstance)
 	{
 		sInstance->mIsDirty = true;
-		sInstance->draw();
 	}
 }
 
@@ -299,9 +308,7 @@ void SLFloaterMediaFilter::onWhitelistRemove(void* data)
 
 		if (sInstance->childGetValue("match_ip") && domain.find('/') == std::string::npos)
 		{
-			LLHost host;
-			host.setHostByName(domain);
-			std::string ip = host.getIPString();
+			std::string ip = LLViewerParcelMedia::getDomainIP(domain, true);
 
 			if (ip != domain)
 			{
@@ -373,9 +380,7 @@ void SLFloaterMediaFilter::onBlacklistRemove(void* data)
 
 		if (sInstance->childGetValue("match_ip") && domain.find('/') == std::string::npos)
 		{
-			LLHost host;
-			host.setHostByName(domain);
-			std::string ip = host.getIPString();
+			std::string ip = LLViewerParcelMedia::getDomainIP(domain, true);
 
 			if (ip != domain)
 			{
@@ -405,10 +410,14 @@ void SLFloaterMediaFilter::onCommitDomain(void* data)
 	}
 	std::string domain = sInstance->childGetText("input_domain");
 	domain = LLViewerParcelMedia::extractDomain(domain);
-	LLHost host;
-	host.setHostByName(domain);
-	std::string ip = host.getIPString();
-	bool match_ip = (sInstance->childGetValue("match_ip") && ip != domain && domain.find('/') == std::string::npos);
+	std::string ip = domain;
+	bool match_ip = (sInstance->childGetValue("match_ip") &&
+					 domain.find('/') == std::string::npos);
+	if (match_ip)
+	{
+		ip = LLViewerParcelMedia::getDomainIP(domain, true);
+		match_ip = (ip != domain);
+	}
 
 	if (!domain.empty())
 	{

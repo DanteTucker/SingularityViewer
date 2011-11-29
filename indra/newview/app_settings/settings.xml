@@ -369,6 +369,17 @@
     <key>Value</key>
     <integer>1</integer>
   </map>
+  <key>MediaLookupIP</key>
+  <map>
+    <key>Comment</key>
+    <string>Enable IP lookups on media domains (incurs short pauses during the lookup but allows to defeat domain name changes of fixed IP servers)</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>1</integer>
+  </map>
   <key>MediaFilterRect</key>
   <map>
     <key>Comment</key>

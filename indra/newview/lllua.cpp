@@ -9,6 +9,34 @@
 #include "llstartup.h"
 #include "llcallbacklist.h"
 
+void dump_stack (lua_State *L) {
+    int i;
+    int top = lua_gettop(L);
+    for (i = 1; i <= top; i++) {  /* repeat for each level */
+    int t = lua_type(L, i);
+    switch (t) {
+    
+        case LUA_TSTRING:  /* strings */
+        LL_INFOS("STACK") << llformat("`%s'", lua_tostring(L, i)) << LL_ENDL;
+        break;
+    
+        case LUA_TBOOLEAN:  /* booleans */
+        LL_INFOS("STACK") << llformat(lua_toboolean(L, i) ? "true" : "false") << LL_ENDL;
+        break;
+    
+        case LUA_TNUMBER:  /* numbers */
+        LL_INFOS("STACK") << llformat("%g", lua_tonumber(L, i)) << LL_ENDL;
+        break;
+    
+        default:  /* other values */
+        LL_INFOS("STACK") << llformat("%s", lua_typename(L, t)) << LL_ENDL;
+        break;
+    
+			}
+    }
+}
+
+
 static std::string LuaPrintStrings(lua_State* L)
 { 
 	int nArgs = lua_gettop(L);
@@ -75,11 +103,6 @@ LLLuaState::LLLuaState()
 LLLuaState::~LLLuaState()
 { 
 	lua_close(L);
-}
-
-LLLuaEngine::LLLuaEngine()
-	:mState()
-{
 }
 
 LLLuaTable::LLLuaTable(lua_State* L)
@@ -157,7 +180,15 @@ static int luaOnPanic(lua_State *L)
 	lua_pop(L, -1);
 	return 0;
 }
-
+LLLuaEngine::LLLuaEngine()
+	:mState()
+{
+	gIdleCallbacks.addFunction(LLLuaEngine::tick);
+}
+LLLuaEngine::~LLLuaEngine()
+{
+	gIdleCallbacks.deleteFunction(&LLLuaEngine::tick);
+}
 void LLLuaEngine::initSingleton()
 {
 	LL_INFOS("Lua") << "Loading Lua..." << LL_ENDL;
@@ -168,6 +199,14 @@ void LLLuaEngine::initSingleton()
 
 	//load binding
 	bind_print(mState, LuaPrint);
+	luna_register(mState, LunaChatCommand); //no message depend
+
+	//logic that happens when idle
+	if(LLStartUp::getStartupState() == STATE_STARTED)
+	{
+		registerBindings();
+		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
+	}
 
 	//hack because im lazy
 	std::string version("_SL_VERSION=\"" + gCurrentVersion + "\"");
@@ -186,7 +225,10 @@ void LLLuaEngine::initSingleton()
 
 	mLoadedFully = true;
 
-	gIdleCallbacks.addFunction(LLLuaEngine::tick, NULL);
+	if(mRegisteredBindings)
+	{
+		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
+	}
 }
 
 void LLLuaEngine::doString(const std::string& s)
@@ -214,7 +256,7 @@ void LLLuaEngine::tick(void* userdata)
 	if(LLStartUp::getStartupState() == STATE_STARTED && !getInstance()->mRegisteredBindings)
 	{
 		getInstance()->registerBindings();
-		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
+		//LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
 	}
 }
 
