@@ -872,6 +872,8 @@ bool idle_startup()
 
 			LLLuaEngine::instance(); //create lua instance
 
+			LUA_HOOK("OnWindowInit",LUA_ARGS_NONE);//Added this so we could properly know when the window is open, and not assume crap.
+
 			LLStartUp::setStartupState( STATE_LOGIN_WAIT );		// Wait for user input
 		}
 		else
@@ -2015,8 +2017,6 @@ bool idle_startup()
 		LLRect window(0, gViewerWindow->getWindowHeight(), gViewerWindow->getWindowWidth(), 0);
 		gViewerWindow->adjustControlRectanglesForFirstUse(window);
 
-		LLLuaEngine::getInstance(); //load is called internally
-
 		if (gSavedSettings.getBOOL("ShowMiniMap"))
 		{
 			LLFloaterMap::showInstance();
@@ -2931,6 +2931,8 @@ bool idle_startup()
 #endif
 
 		LLAppViewer::instance()->handleLoginComplete();
+
+		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);//everything is ready, gogo.
 
 		return TRUE;
 	}

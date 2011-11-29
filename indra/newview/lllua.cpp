@@ -214,7 +214,7 @@ void LLLuaEngine::tick(void* userdata)
 	if(LLStartUp::getStartupState() == STATE_STARTED && !getInstance()->mRegisteredBindings)
 	{
 		getInstance()->registerBindings();
-		LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
+		//LUA_HOOK("OnAgentInit",LUA_ARGS_NONE);
 	}
 }
 
