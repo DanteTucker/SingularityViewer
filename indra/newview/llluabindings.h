@@ -3,6 +3,7 @@
 #include "lllua.h"
 #include "lluuid.h"
 #include "lleasymessagesender.h"
+#include "chatbar_as_cmdline.h"
 
 #include <map>
 
@@ -49,7 +50,6 @@ protected:
 class LunaMessageHandler
 {
 	LunaBase(LunaMessageHandler)
-
 	LunaMessageHandler(lua_State* L);
 	~LunaMessageHandler();
 
@@ -67,10 +67,26 @@ class LunaMessageHandler
 	boost::signals2::connection mMessageConnection;
 };
 
+class LunaChatCommand : public CmdLineChatCommand
+{
+public:
+	/*virtual*/ void execute(std::string text);
+private:
+	LunaBase(LunaChatCommand)
+	LunaChatCommand(lua_State* L);
+	~LunaChatCommand();
+	int deleteme(lua_State* L);
+
+	/*virtual*/ bool execute(const std::string& text);
+	int mFuncRef;
+
+	bool mDisconnected;
+};
 /*class LunaUUID : public LLUUID
 {
 	LunaBase(LunaUUID)
 
 	LunaUUID(lua_State* L);
 }*/
+
 #endif

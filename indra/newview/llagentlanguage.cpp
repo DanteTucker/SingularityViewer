@@ -31,13 +31,16 @@
  */
 
 #include "llviewerprecompiledheaders.h"
+
 #include "llagentlanguage.h"
+
+// library includes
+#include "llui.h"					// getLanguage()
+
 // viewer includes
 #include "llagent.h"
 #include "llviewercontrol.h"
 #include "llviewerregion.h"
-// library includes
-#include "llui.h"					// getLanguage()
 
 LLAgentLanguage::LLAgentLanguage()
 {
@@ -47,27 +50,25 @@ LLAgentLanguage::LLAgentLanguage()
 	gSavedSettings.getControl("LanguageIsPublic")->getSignal()->connect(boost::bind(&update));
 }
 
-
 // send language settings to the sim
 // static
 bool LLAgentLanguage::update()
 {
-	LLSD body;
 	std::string url;
-
 	if (gAgent.getRegion())
 	{
 		url = gAgent.getRegion()->getCapability("UpdateAgentLanguage");
 	}
-
 	if (!url.empty())
 	{
 		std::string language = LLUI::getLanguage();
-		
+
+		LLSD body;
 		body["language"] = language;
 		body["language_is_public"] = gSavedSettings.getBOOL("LanguageIsPublic");
-		
+
 		LLHTTPClient::post(url, body, new LLHTTPClient::Responder);
 	}
+
     return true;
 }

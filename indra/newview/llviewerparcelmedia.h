@@ -71,6 +71,7 @@ class LLViewerParcelMedia : public LLViewerMediaObserver
 		static void saveDomainFilterList();
 		static void clearDomainFilterList();
 		static std::string extractDomain(std::string url);
+		static std::string getDomainIP(const std::string& domain, bool force = false);
 
 		static void stop();
 			// user clicked stop button in media transport controls
@@ -107,8 +108,10 @@ class LLViewerParcelMedia : public LLViewerMediaObserver
 		static std::set<std::string> sMediaQueries;
 		static std::set<std::string> sAllowedMedia;
 		static std::set<std::string> sDeniedMedia;
-};
 
+private:
+	static std::map<std::string, std::string> sDNSlookups;
+};
 
 class LLViewerParcelMediaNavigationObserver
 {
