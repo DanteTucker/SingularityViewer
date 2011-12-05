@@ -231,6 +231,7 @@ set(viewer_SOURCE_FILES
     llfloatermemleak.cpp
     llfloatermessagebuilder.cpp
     llfloatermessagelog.cpp
+    llfloatermodeluploadbase.cpp
     llfloatermute.cpp
     llfloaternamedesc.cpp
     llfloaternewim.cpp
@@ -433,6 +434,7 @@ set(viewer_SOURCE_FILES
     lltrans.cpp
     lltranslate.cpp
     lluploaddialog.cpp
+	lluploadfloaterobservers.cpp
     llurl.cpp
     llurldispatcher.cpp
     llurlhistory.cpp
@@ -727,6 +729,7 @@ set(viewer_HEADER_FILES
     llfloaterlandmark.h
     llfloatermap.h
     llfloatermemleak.h
+    llfloatermodeluploadbase.h
     llfloatermessagebuilder.h
     llfloatermessagelog.h
     llfloatermute.h
@@ -934,6 +937,7 @@ set(viewer_HEADER_FILES
     lltranslate.h
     lluiconstants.h
     lluploaddialog.h
+	lluploadfloaterobservers.h
     llurl.h
     llurldispatcher.h
     llurlhistory.h
@@ -1069,7 +1073,7 @@ if (DARWIN)
 
   # Add resource files to the project.
   set(viewer_RESOURCE_FILES
-    ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.icns
+    ${VIEWER_BRANDING_ID}.icns
     macview.r
     gpu_table.txt
     Info-${VIEWER_BRANDING_NAME_CAMELCASE}.plist
@@ -1159,8 +1163,8 @@ if (WINDOWS)
         ${ARTWORK_DIR}/res/lltooltranslate.cur
         ${ARTWORK_DIR}/res/lltoolzoomin.cur
         ${ARTWORK_DIR}/res/lltoolzoomout.cur
-        ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.bmp
-        ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.ico
+        ${ARTWORK_DIR}/res/snowglobe_icon.BMP
+        ${ARTWORK_DIR}/res/snowglobe_icon.ico
         ${ARTWORK_DIR}/res/resource.h
         ${ARTWORK_DIR}/res/toolbuy.cur
         ${ARTWORK_DIR}/res/toolopen.cur
@@ -1391,7 +1395,7 @@ if (WINDOWS)
     
     set_target_properties(${VIEWER_BINARY_NAME}
         PROPERTIES
-        LINK_FLAGS "/debug /NODEFAULTLIB:LIBCMT /SUBSYSTEM:WINDOWS ${GOOGLE_PERFTOOLS_LINKER_FLAGS} /LARGEADDRESSAWARE"
+        LINK_FLAGS "/debug /NODEFAULTLIB:LIBCMT /SUBSYSTEM:WINDOWS ${GOOGLE_PERFTOOLS_LINKER_FLAGS}"
         LINK_FLAGS_DEBUG "/NODEFAULTLIB:\"LIBCMT;LIBCMTD;MSVCRT\""
         LINK_FLAGS_RELEASE ${release_flags}
         )
@@ -1555,7 +1559,7 @@ if (DARWIN)
     PROPERTIES
     OUTPUT_NAME "${product}"
     MACOSX_BUNDLE_INFO_STRING "A stable third-party Second Life viewer."
-    MACOSX_BUNDLE_ICON_FILE "${VIEWER_BRANDING_NAME}.icns"
+    MACOSX_BUNDLE_ICON_FILE "${VIEWER_BRANDING_ID}.icns"
     MACOSX_BUNDLE_GUI_IDENTIFIER "${VIEWER_BRANDING_NAME}"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${viewer_VERSION}"
     MACOSX_BUNDLE_BUNDLE_NAME "${VIEWER_BRANDING_NAME}"
@@ -1729,6 +1733,7 @@ if (WINDOWS)
 	 ${mime_types_dest}/mime_types.xml
       COMMENT "Copying mime_types_windows.xml to mime_types.xml."
       )
+  
 endif (WINDOWS)
 
 if (DARWIN)

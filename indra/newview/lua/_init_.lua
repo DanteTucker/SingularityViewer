@@ -20,11 +20,23 @@ require "libhook"
 print "Registering Hooks"
 registerHook("OnAgentInit", "This is called when the Agent and World has been loaded. This also indicates when World related bindings have been loaded.")
 
-local function pack2(...) return {n=select('#', ...), ...} end
-local function unpack2(t) return unpack(t, 1, t.n) end
+local function dostring_vaarg(...)
+	local result = ""
+	for i,v in ipairs(arg) do
+		result = result .. " " .. tostring(v)
+	end
+	local func, errorMessage = loadstring(result)
+	if not func then
+		print(errorMessage)
+		return
+	end
+	r, errorMessage = pcall(func)
+	if r == false then
+		print(errors)
+	end
+end
 
-local chat_lua_dostring = ChatCommand("/lua",function(...) loadstring( unpack2(pack2(...)) )() end)
-
+local chat_lua_dostring = ChatCommand("/lua",function(...) dostring_vaarg(...) end)
 
 function printMessage(x)
 	for k,v in pairs(x) do
