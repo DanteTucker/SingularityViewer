@@ -333,7 +333,7 @@ void LLWorldMapView::draw()
 	{
 		gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 	
-		glMatrixMode(GL_MODELVIEW);
+		gGL.matrixMode(LLRender::MM_MODELVIEW);
 
 		// Clear the background alpha to 0
 		gGL.flush();
@@ -1151,7 +1151,7 @@ void LLWorldMapView::drawFrustum()
 	// Since we don't rotate the map, we have to rotate the frustum.
 	gGL.pushMatrix();
 		gGL.translatef( ctr_x, ctr_y, 0 );
-		glRotatef( atan2( LLViewerCamera::getInstance()->getAtAxis().mV[VX], LLViewerCamera::getInstance()->getAtAxis().mV[VY] ) * RAD_TO_DEG, 0.f, 0.f, -1.f);
+		gGL.rotatef( atan2( LLViewerCamera::getInstance()->getAtAxis().mV[VX], LLViewerCamera::getInstance()->getAtAxis().mV[VY] ) * RAD_TO_DEG, 0.f, 0.f, -1.f);
 
 		// Draw triangle with more alpha in far pixels to make it 
 		// fade out in distance.
@@ -1776,7 +1776,7 @@ void LLWorldMapView::drawTrackingCircle( const LLRect& rect, S32 x, S32 y, const
 		end_theta -= angle_adjust_y;
 	}
 
-	glMatrixMode(GL_MODELVIEW);
+	gGL.matrixMode(LLRender::MM_MODELVIEW);
 	gGL.pushMatrix();
 	gGL.translatef((F32)x, (F32)y, 0.f);
 	gl_washer_segment_2d(inner_radius, outer_radius, start_theta, end_theta, 40, color, color);

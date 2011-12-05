@@ -6,10 +6,14 @@ LLMessageLogEntry::LLMessageLogEntry(EType type, LLHost from_host, LLHost to_hos
 	mFromHost(from_host),
 	mToHost(to_host),
 	mDataSize(data_size),
-	mData(data,data + data_size)
+	mData(new U8[data_size])
 {
+	if(data && data_size)
+	{
+		memcpy(&(mData[0]), &(data[0]), data_size); //copy the data into a LLPointer controlled array.
+	}
 }
-LLMessageLogEntry::LLMessageLogEntry(EType type, LLHost from_host, LLHost to_host, std::vector<U8> data, S32 data_size)
+LLMessageLogEntry::LLMessageLogEntry(EType type, LLHost from_host, LLHost to_host, const boost::shared_array<U8> &data, S32 data_size)
 :	mType(type),
 	mFromHost(from_host),
 	mToHost(to_host),
@@ -38,7 +42,7 @@ void LLMessageLog::log(LLHost from_host, LLHost to_host, U8* data, S32 data_size
 	if(data && data_size)
 	{
 		LLMessageLogEntry entry = LLMessageLogEntry(LLMessageLogEntry::TEMPLATE, from_host, to_host, data, data_size);
-		if(!entry.mDataSize || !entry.mData.size()) return;
+		if(!entry.mDataSize) return;
 		if(sCallback) sCallback(entry);
 		if(!sMaxSize) return;
 		sDeque.push_back(entry);

@@ -741,7 +741,10 @@ void LLImageGL::setImage(const U8* data_in, BOOL data_hasmips)
 		{
 			if (mAutoGenMips)
 			{
-				glTexParameteri(LLTexUnit::getInternalType(mBindTarget), GL_GENERATE_MIPMAP_SGIS, TRUE);
+				if (!gGLManager.mHasFramebufferObject)
+				{
+					glTexParameteri(LLTexUnit::getInternalType(mBindTarget), GL_GENERATE_MIPMAP_SGIS, TRUE);
+				}
 				stop_glerror();
 				{
 // 					LLFastTimer t2(LLFastTimer::FTM_TEMP4);
@@ -769,6 +772,12 @@ void LLImageGL::setImage(const U8* data_in, BOOL data_hasmips)
 						glPixelStorei(GL_UNPACK_SWAP_BYTES, 0);
 						stop_glerror();
 					}
+				}
+
+				if (gGLManager.mHasFramebufferObject)
+				{
+					//GL_EXT_framebuffer_object implies glGenerateMipmap
+					glGenerateMipmap(LLTexUnit::getInternalType(mBindTarget));
 				}
 			}
 			else
@@ -1740,7 +1749,7 @@ void LLImageGL::analyzeAlpha(const void* data_in, U32 w, U32 h)
 	// this to be an intentional effect and don't treat as a mask.
 
 	U32 midrangetotal = 0;
-	for (U32 i = 4; i < 11; i++)
+	for (U32 i = 2; i < 13; i++)
 	{
 		midrangetotal += sample[i];
 	}
@@ -1755,7 +1764,7 @@ void LLImageGL::analyzeAlpha(const void* data_in, U32 w, U32 h)
 		upperhalftotal += sample[i];
 	}
 
-	if (midrangetotal > length/16 || // lots of midrange, or
+	if (midrangetotal > length/48 || // lots of midrange, or
 	    (lowerhalftotal == length && alphatotal != 0) || // all close to transparent but not all totally transparent, or
 	    (upperhalftotal == length && alphatotal != 255*length)) // all close to opaque but not all totally opaque
 	{

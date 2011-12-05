@@ -29,12 +29,12 @@ LLFloaterMessageLogItem::LLFloaterMessageLogItem(LLMessageLogEntry entry)
 	mSequenceID = 0;
 	if(mType == TEMPLATE)
 	{
+		static U8 mDecodeBuffer[MAX_PACKET_LEN];
 		BOOL decode_invalid = FALSE;
 		S32 decode_len = mDataSize;
-		std::vector<U8> DecodeBuffer(MAX_PACKET_LEN,0);
-		memcpy(&(DecodeBuffer[0]),&(mData[0]),decode_len);
-		U8* decodep = &(DecodeBuffer[0]);
-		mFlags = DecodeBuffer[0];
+		memcpy(&(mDecodeBuffer[0]),&(mData[0]),decode_len);
+		U8* decodep = &(mDecodeBuffer[0]);
+		mFlags = mDecodeBuffer[0];
 		gMessageSystem->zeroCodeExpand(&decodep, &decode_len);
 		if(decode_len < 7)
 			decode_invalid = TRUE;

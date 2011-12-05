@@ -3,8 +3,11 @@
 #define LL_LLMESSAGELOG_H
 #include "stdtypes.h"
 #include "llhost.h"
+
 #include <queue>
 #include <string.h>
+
+#include <boost\shared_array.hpp>
 
 class LLMessageSystem;
 class LLMessageLogEntry
@@ -17,13 +20,13 @@ public:
 		HTTP_RESPONSE
 	};
 	LLMessageLogEntry(EType type, LLHost from_host, LLHost to_host, U8* data, S32 data_size);
-	LLMessageLogEntry(EType type, LLHost from_host, LLHost to_host, std::vector<U8> data, S32 data_size);
+	LLMessageLogEntry(EType type, LLHost from_host, LLHost to_host, const boost::shared_array<U8> &data, S32 data_size);
 	~LLMessageLogEntry();
 	EType mType;
 	LLHost mFromHost;
 	LLHost mToHost;
 	S32 mDataSize;
-	std::vector<U8> mData;
+	boost::shared_array<U8> mData;
 };
 class LLMessageLog
 {
