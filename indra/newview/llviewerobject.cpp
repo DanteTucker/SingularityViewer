@@ -3070,24 +3070,27 @@ void LLViewerObject::setScale(const LLVector3 &scale, BOOL damped)
 		updateDrawable(damped);
 	}
 
-	if( (LL_PCODE_VOLUME == getPCode()) && !isDead() )
+	if(getRegion() != NULL) //<edit/>
 	{
-		if (permYouOwner() || (scale.magVecSquared() > (7.5f * 7.5f)) )
+		if( (LL_PCODE_VOLUME == getPCode()) && !isDead() )
 		{
-			if (!mOnMap)
+			if (permYouOwner() || (scale.magVecSquared() > (7.5f * 7.5f)) )
 			{
-				llassert_always(LLWorld::getInstance()->getRegionFromHandle(getRegion()->getHandle()));
+				if (!mOnMap)
+				{
+					llassert_always(LLWorld::getInstance()->getRegionFromHandle(getRegion()->getHandle()));
 
-				gObjectList.addToMap(this);
-				mOnMap = TRUE;
+					gObjectList.addToMap(this);
+					mOnMap = TRUE;
+				}
 			}
-		}
-		else
-		{
-			if (mOnMap)
+			else
 			{
-				gObjectList.removeFromMap(this);
-				mOnMap = FALSE;
+				if (mOnMap)
+				{
+					gObjectList.removeFromMap(this);
+					mOnMap = FALSE;
+				}
 			}
 		}
 	}
