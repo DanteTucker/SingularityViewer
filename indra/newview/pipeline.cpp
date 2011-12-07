@@ -4889,6 +4889,7 @@ void LLPipeline::setupHWLights(LLDrawPool* pool)
 			}
 			
 			LLColor4  light_color = light->getLightColor();
+			light_color *= light->getLightIntensity();
 			light_color.mV[3] = 0.0f;
 
 			F32 fade = iter->fade;
