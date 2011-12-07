@@ -803,6 +803,50 @@ void LLXmlImport::finish_init()
 	// Go ahead and upload asset data
 	rez_supply();
 }
+
+void multiple_object_update(LLViewerObject* object, U8 type)
+{
+	gMessageSystem->newMessage("MultipleObjectUpdate");
+
+	gMessageSystem->nextBlockFast(_PREHASH_AgentData);
+	gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
+	gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
+
+	U8	data[256];
+
+	gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
+	gMessageSystem->addU32Fast(_PREHASH_ObjectLocalID,	object->getLocalID() );
+	gMessageSystem->addU8Fast(_PREHASH_Type, type );
+
+	S32 offset = 0;
+
+	// JC: You MUST pack the data in this order.  The receiving
+	// routine process_multiple_update_message on simulator will
+	// extract them in this order.
+
+	if (type & UPD_POSITION)
+	{
+		htonmemcpy(&data[offset], &(object->getPosition().mV), MVT_LLVector3, 12); 
+		offset += 12;
+	}
+	if (type & UPD_ROTATION)
+	{
+		LLQuaternion quat = object->getRotation();
+		LLVector3 vec = quat.packToVector3();
+		htonmemcpy(&data[offset], &(vec.mV), MVT_LLQuaternion, 12); 
+		offset += 12;
+	}
+	if (type & UPD_SCALE)
+	{
+		//llinfos << "Sending object scale " << object->getScale() << llendl;
+		htonmemcpy(&data[offset], &(object->getScale().mV), MVT_LLVector3, 12); 
+		offset += 12;
+	}
+	gMessageSystem->addBinaryDataFast(_PREHASH_Data, data, offset);
+
+	gAgent.sendReliableMessage();
+}
+
 // static
 void LLXmlImport::onNewPrim(LLViewerObject* object)
 {
@@ -824,7 +868,6 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 	}
 	
 	sExpectedUpdate = object->getID();
-	LLSelectMgr::getInstance()->selectObjectAndFamily(object);
 
 	LLImportObject* from = sPrims[sPrimIndex];
 	
@@ -858,9 +901,7 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 	
 	//using this because sendMultipleUpdate breaks rotations?
 	object->sendRotationUpdate();
-	LLSelectMgr::getInstance()->sendMultipleUpdate(UPD_SCALE | UPD_POSITION);
-
-	LLSelectMgr::getInstance()->deselectAll();
+	multiple_object_update(object, UPD_SCALE | UPD_POSITION);
 }
 void LLXmlImport::onUpdatePrim(LLViewerObject* object)
 {
