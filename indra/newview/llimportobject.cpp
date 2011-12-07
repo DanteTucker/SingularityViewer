@@ -806,7 +806,7 @@ void LLXmlImport::finish_init()
 
 void multiple_object_update(LLViewerObject* object, U8 type)
 {
-	gMessageSystem->newMessage("MultipleObjectUpdate");
+	gMessageSystem->newMessageFast(_PREHASH_MultipleObjectUpdate);
 
 	gMessageSystem->nextBlockFast(_PREHASH_AgentData);
 	gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
@@ -903,6 +903,19 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 	object->sendRotationUpdate();
 	multiple_object_update(object, UPD_SCALE | UPD_POSITION);
 }
+
+void send_desc(U32 local_id, const std::string& desc)
+{
+	gMessageSystem->newMessageFast(_PREHASH_ObjectDescription);
+	gMessageSystem->nextBlockFast(_PREHASH_AgentData);
+	gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
+	gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
+	gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
+	gMessageSystem->addU32Fast(_PREHASH_LocalID, local_id);
+	gMessageSystem->addStringFast(_PREHASH_Description, desc);
+	gAgent.sendReliableMessage();
+}
+
 void LLXmlImport::onUpdatePrim(LLViewerObject* object)
 {
 	if(object != NULL)
@@ -911,7 +924,7 @@ void LLXmlImport::onUpdatePrim(LLViewerObject* object)
 				return;
 
 	LLImportObject* from = sPrims[sPrimIndex];
-	LLSelectMgr::getInstance()->selectObjectAndFamily(object);
+
 	// Volume params
 	LLVolumeParams params = from->getVolume()->getParams();
 	object->setVolume(params, 0, false);
@@ -975,26 +988,36 @@ void LLXmlImport::onUpdatePrim(LLViewerObject* object)
 	// Name
 	std::string name = from->mPrimName;
 	if(name.empty())
-		name = "Object";
-	LLSelectMgr::getInstance()->selectionSetObjectName(from->mPrimName);
+		name = "Object"; //set to Object just incase the import prim isnt Object.
+	
+	gMessageSystem->newMessageFast(_PREHASH_ObjectName);
+	gMessageSystem->nextBlockFast(_PREHASH_AgentData);
+	gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
+	gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
+	gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
+	gMessageSystem->addU32Fast(_PREHASH_LocalID, object->getLocalID());
+	gMessageSystem->addStringFast(_PREHASH_Name, name);
+	gAgent.sendReliableMessage();
 			
 	//Description
+	std::string desc = from->mPrimDescription;
 	if(from->importIsAttachment) //special description tracker
 	{
-		LLSelectMgr::getInstance()->selectionSetObjectDescription(from->mId);
+		desc = from->mId;
 	}
 	else
-	{	
-		std::string desc = from->mPrimDescription;
+	{
 		if(desc.empty())
 			desc = "(No Description)";
-		LLSelectMgr::getInstance()->selectionSetObjectDescription(desc);
 	}
+	send_desc(object->getLocalID(), desc);
+
 	sExpectedUpdate = LLUUID::null;
 	sPrimIndex++;
 	/////// finished block /////////
 	if(sPrimIndex >= (int)sPrims.size())
 	{
+		// TODO: Remove LLSelectMgr dependencies 
 		// Link time
 		for(std::map<U32, std::vector<LLViewerObject*> >::iterator itr = sLinkSets.begin();itr != sLinkSets.end();++itr)
 		{
@@ -1040,7 +1063,6 @@ void LLXmlImport::onUpdatePrim(LLViewerObject* object)
 		LLFloaterImportProgress::update();
 		rez_supply();
 	}
-	LLSelectMgr::getInstance()->deselectAll();
 }
 void LLXmlImport::finish_link()
 {
@@ -1104,20 +1126,17 @@ void LLXmlImport::onNewAttachment(LLViewerObject* object)
 	U8 attachpt = (U8)object->getAttachmentPoint();
 	if(sPt2watch[attachpt])
 	{
-		LLSelectMgr::getInstance()->selectObjectAndFamily(object);
-
 		// clear description, part 2
 		std::string desc = sDescriptions[attachpt];
 		if(desc.empty())
 			desc = "(No Description)";
-		LLSelectMgr::getInstance()->selectionSetObjectDescription(desc);
+		send_desc(object->getLocalID(), desc);
 
 		// position and rotation
 		object->setRotation(sPt2attachrot[attachpt], FALSE);
 		object->setPosition(sPt2attachpos[attachpt], FALSE);
-		LLSelectMgr::getInstance()->sendMultipleUpdate(UPD_POSITION | UPD_ROTATION);
+		multiple_object_update(object, UPD_POSITION | UPD_ROTATION);
 		
-		LLSelectMgr::getInstance()->deselectAll();
 		// Done?
 		sAttachmentsDone++;
 		if(sAttachmentsDone >= (int)sPt2attachpos.size())
