@@ -42,6 +42,9 @@
 #include "llquaternion.h"
 #include "llpolymorph.h"
 #include "lljoint.h"
+
+//#include "aWavefront.h" //conflicts with stuff
+
 //#include "lldarray.h"
 
 class LLSkinJoint;
@@ -191,6 +194,12 @@ public:
 
 	// Requests mesh data by name.  Returns null if not found.
 	static LLPolyMeshSharedData *getMeshData( const std::string &name );
+
+	// Saves the mesh information as a binary Linden Lab Mesh file.
+	//BOOL saveLLM(LLFILE *fp);
+
+	// Saves the mesh information as an OBJ file.
+	S32 saveOBJ(LLFILE *fp, int index = 0);
 
 	// Frees all loaded meshes.
 	// This should only be called once you know there are no outstanding
@@ -356,6 +365,7 @@ public:
 	U32				mFaceIndexCount;
 	U32				mCurVertexCount;
 
+public:
 	// Dumps diagnostic information about the global mesh table
 	static void dumpDiagInfo(void*);
 
@@ -457,6 +467,10 @@ protected:
 	LLVector3	mDefaultVec;
 	// Backlink only; don't make this an LLPointer.
 	LLVOAvatar *mAvatar;
+
+public:
+	// Saves the mesh information as an OBJ file.
+	BOOL saveOBJ(LLFILE *fp);
 };
 
 #endif // LL_LLPOLYMESH_H

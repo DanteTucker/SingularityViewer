@@ -229,6 +229,7 @@
 #include "llviewerwindow.h"
 #include "llvoavatar.h"
 #include "llvolume.h"
+#include "llvovolume.h"
 #include "llweb.h"
 #include "llworld.h"
 #include "llworldmap.h"
@@ -241,6 +242,10 @@
 #include "llwlparammanager.h"
 #include "llwaterparammanager.h"
 #include "llfloaternotificationsconsole.h"
+#include "aWavefront.h"
+
+#include "llpolymesh.h"
+#include "lltexlayer.h"
 
 #include "lltexlayer.h"
 
@@ -435,6 +440,12 @@ void handle_god_mode(void*);
 void handle_leave_god_mode(void*);
 
 // <edit>
+void save_avatar_to_obj(LLVOAvatar *avatar);
+void save_selected_avatar_to_obj();
+void save_selected_objects_to_obj();
+void save_world_to_obj();
+void handle_save_current_avatar_obj(void*);
+void handle_mesh_save_world_obj(void*);
 void handle_fake_away_status(void*);
 void handle_area_search(void*);
 void handle_lua_console(void*);
@@ -612,6 +623,7 @@ void handle_mesh_load_obj(void*);
 void handle_morph_save_obj(void*);
 void handle_morph_load_obj(void*);
 void handle_debug_avatar_textures(void*);
+void handle_meshes_and_morphs(void*);
 void handle_grab_texture(void*);
 BOOL enable_grab_texture(void*);
 void handle_dump_region_object_cache(void*);
@@ -865,7 +877,12 @@ void init_menus()
 	menu->append(new LLMenuItemCallGL(	"KeyTool from Clipboard",
 											&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
 	menu->append(new LLMenuItemCallGL(	"Lua Console", &handle_lua_console, NULL));
-	
+	menu->append(new LLMenuItemCallGL(	"Save Entire Avatar OBJ",
+										&handle_save_current_avatar_obj, NULL, NULL, 'X', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(	"Save World OBJ",
+										&handle_mesh_save_world_obj, NULL, NULL, 'W', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
+										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
 	
 	
 	// <dogmode>
@@ -1642,6 +1659,10 @@ void init_debug_avatar_menu(LLMenuGL* menu)
 	sub_menu->createJumpKeys();
 
 	menu->appendMenu(sub_menu);
+	
+	LLMenuItemCallGL* mesh_item = new LLMenuItemCallGL("Meshes And Morphs...", handle_meshes_and_morphs);
+	mesh_item->setUserData((void*)mesh_item);  // So we can remove it later
+	menu->append(mesh_item);
 
 	menu->append(new LLMenuItemToggleGL("Tap-Tap-Hold To Run", &gAllowTapTapHoldRun));
 	menu->append(new LLMenuItemCallGL("Force Params to Default", &LLAgent::clearVisualParams, NULL));
@@ -6378,6 +6399,25 @@ class LLAvatarInviteToGroup : public view_listener_t
 	}
 };
 
+
+class LLAvatarSaveAsOBJ : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		save_selected_avatar_to_obj();
+		return true;
+	}
+};
+
+class LLSelectionSaveAsOBJ : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		save_selected_objects_to_obj();
+		return true;
+	}
+};
+
 class LLAvatarAddFriend : public view_listener_t
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
@@ -9362,6 +9402,333 @@ BOOL get_visibility(void* user_data)
 	return viewp->getVisible();
 }
 
+void handle_save_current_avatar_obj(void* data)
+{
+	if(gAgent.getAvatarObject())
+		save_avatar_to_obj(gAgent.getAvatarObject());
+}
+
+void handle_mesh_save_world_obj(void* data) //save the world!
+{
+	save_world_to_obj();
+}
+void save_selected_avatar_to_obj()
+{
+	LLVOAvatar* avatar = find_avatar_from_object( LLSelectMgr::getInstance()->getSelection()->getPrimaryObject() );
+	if(avatar)
+		save_avatar_to_obj(avatar);
+}
+void save_avatar_to_obj(LLVOAvatar *avatar)	
+{
+	std::string file_name = llformat("%s.obj", avatar->getFullname().c_str());
+	std::string full_path = gDirUtilp->getExpandedFilename(LL_PATH_LAST,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename << " for mesh " << file_name <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			/*Flawfinder: ignore*/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+	try
+	{
+		WavefrontSaver wfsaver = WavefrontSaver();
+		wfsaver.Add(avatar);
+		wfsaver.saveFile(fp);
+	}
+	catch(int e)
+	{
+		llwarns << "An exception occurred while generating / saving avatar to OBJ file. Exception #" << e << llendl;
+	}
+	fclose(fp);
+}
+void save_selected_objects_to_obj()
+{
+	LLObjectSelectionHandle selection = LLSelectMgr::getInstance()->getSelection();
+	if(!selection)
+		return;
+	std::string file_name = llformat("%s.obj", selection->getFirstNode()->mName.c_str());
+	std::string full_path = gDirUtilp->getExpandedFilename(LL_PATH_LAST,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename << " for mesh " << file_name <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			/*Flawfinder: ignore*/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+	try
+	{
+		WavefrontSaver wfsaver = WavefrontSaver();
+		LLSelectNode* root_one = (LLSelectNode *)*selection->root_begin();
+		wfsaver.offset = -root_one->getObject()->getRenderPosition();
+		for (LLObjectSelection::iterator iter = selection->begin();
+			iter != selection->end(); iter++)
+		{
+			LLSelectNode* node = *iter;
+			LLViewerObject* object = node->getObject();
+			wfsaver.Add(object);
+		}
+		wfsaver.saveFile(fp);
+	}
+	catch(int e)
+	{
+		llwarns << "An exception occurred while generating / saving avatar to OBJ file. Exception #" << e << llendl;
+	}
+	fclose(fp);
+}
+void save_world_to_obj()
+{
+	llinfos << "This function has yet to be implemented *snooze*" << llendl;
+	/*
+	std::string file_name = "world.obj";
+	std::string full_path = gDirUtilp->getExpandedFilename(LL_PATH_LAST,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename << " for mesh " << file_name <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			//*Flawfinder: ignore*-/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+	try
+	{
+		wfsaver.Add(freaking_everything);
+	}
+	catch(int e)
+	{
+		llwarns << "An exception occurred while generating / saving avatar to OBJ file. Exception #" << e << llendl;
+	}
+	fclose(fp);*/
+}
+void handle_mesh_save_current_obj(void* data)
+{
+	LLPolyMeshSharedData* mesh_shared = (LLPolyMeshSharedData*) data;
+	const std::string& name = *LLPolyMesh::getSharedMeshName(mesh_shared);
+
+	std::string file_name = name + "_current.obj";
+
+	std::string full_path;
+	full_path = gDirUtilp->getExpandedFilename(LL_PATH_CHARACTER,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename << " for mesh " << name <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			/*Flawfinder: ignore*/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+
+	LLVOAvatar* avatar = gAgent.getAvatarObject();
+	if ( avatar )
+	{
+		LLPolyMesh* mesh = avatar->getMesh (mesh_shared);
+		mesh->saveOBJ(fp);
+	}
+	fclose(fp);
+}
+
+void handle_mesh_save_obj(void* data)
+{
+	LLPolyMeshSharedData* mesh_shared = (LLPolyMeshSharedData*) data;
+	const std::string& name = *LLPolyMesh::getSharedMeshName(mesh_shared);
+
+	std::string file_name = name + ".obj";
+
+	std::string full_path;
+	full_path = gDirUtilp->getExpandedFilename(LL_PATH_CHARACTER,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename << " for mesh " << name <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			/*Flawfinder: ignore*/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+
+	LLPolyMesh mesh(mesh_shared,NULL);
+	mesh.saveOBJ(fp);
+	fclose(fp);
+}
+
+void handle_morph_save_obj(void* data)
+{
+	LLPolyMorphData* morph_data = (LLPolyMorphData*) data;
+	LLPolyMeshSharedData* mesh_shared = morph_data->mMesh;
+	const std::string& mesh_name = *LLPolyMesh::getSharedMeshName(mesh_shared);
+	const std::string& morph_name = morph_data->getName();
+
+	llinfos << "Save morph OBJ " << morph_name << " of mesh " << mesh_name <<llendl;
+
+	std::string file_name = mesh_name + "." + morph_name + ".obj";
+
+	std::string full_path;
+	full_path = gDirUtilp->getExpandedFilename(LL_PATH_CHARACTER,file_name);
+
+	LLFilePicker& picker = LLFilePicker::instance();
+	if(!picker.getSaveFile(LLFilePicker::FFSAVE_ALL, full_path))
+	{
+		llwarns << "No file" << llendl;
+		return;
+	}
+	std::string selected_filename = picker.getFirstFile();
+
+	llinfos << "Selected " << selected_filename <<llendl;
+
+	LLFILE* fp = LLFile::fopen(selected_filename, "wb");			/*Flawfinder: ignore*/
+	if (!fp)
+	{
+		llerrs << "can't open: " << selected_filename << llendl;
+		return;
+	}
+
+	morph_data->saveOBJ(fp);
+	fclose(fp);
+}
+
+
+void handle_meshes_and_morphs(void* menu_item)
+{
+	//LLMenuItemCallGL* item = (LLMenuItemCallGL*) menu_item;
+	//LLMenuGL* parent_menu = (LLMenuGL*) item->getParent();
+	//parent_menu->remove(item);
+	
+	LLMenuGL* menu = new LLMenuGL("Meshes And Morphs");
+	menu->appendSeparator();
+	//menu->append(new LLMenuItemCallGL("Dump Avatar Mesh Info", &LLPolyMesh::dumpDiagInfo));
+	//menu->appendSeparator();
+	
+	LLVOAvatar::mesh_info_t mesh_info;
+	LLVOAvatar::getMeshInfo(&mesh_info);
+
+	for(LLVOAvatar::mesh_info_t::iterator info_iter = mesh_info.begin();
+		info_iter != mesh_info.end(); ++info_iter)
+	{
+		const std::string& type = info_iter->first;
+		LLVOAvatar::lod_mesh_map_t& lod_mesh = info_iter->second;
+
+		LLMenuGL* type_menu = new LLMenuGL(type);
+
+		for(LLVOAvatar::lod_mesh_map_t::iterator lod_iter = lod_mesh.begin();
+			lod_iter != lod_mesh.end(); ++lod_iter)
+		{
+			S32 lod = lod_iter->first;
+			std::string& mesh = lod_iter->second;
+
+			std::string caption = llformat ("%s LOD %d", type.c_str(), lod);
+
+			if (lod == 0)
+			{
+				caption = type;
+			}
+
+			LLPolyMeshSharedData* mesh_shared = LLPolyMesh::getMeshData(mesh);
+
+			LLPolyMesh::morph_list_t morph_list;
+			LLPolyMesh::getMorphList(mesh, &morph_list);
+
+			LLMenuGL* lod_menu = new LLMenuGL(caption);
+			//lod_menu->append(new LLMenuItemCallGL("Save LLM", handle_mesh_save_llm, NULL, (void*) mesh_shared));
+
+			LLMenuGL* action_menu = new LLMenuGL("Base Mesh");
+			action_menu->append(new LLMenuItemCallGL("Save OBJ", handle_mesh_save_obj, NULL, (void*) mesh_shared));
+
+			//if (lod == 0)
+			//{
+				// Since an LOD mesh has only faces, we won't enable this for
+				// LOD meshes until we add code for processing the face commands.
+
+			//	action_menu->append(new LLMenuItemCallGL("Load OBJ", handle_mesh_load_obj, NULL, (void*) mesh_shared));
+			//}
+
+			action_menu->createJumpKeys();
+			lod_menu->appendMenu(action_menu);
+
+			action_menu = new LLMenuGL("Current Mesh");
+
+			action_menu->append(new LLMenuItemCallGL("Save OBJ", handle_mesh_save_current_obj, NULL, (void*) mesh_shared));
+
+			action_menu->createJumpKeys();
+			lod_menu->appendMenu(action_menu);
+
+			lod_menu->appendSeparator();
+
+			for(LLPolyMesh::morph_list_t::iterator morph_iter = morph_list.begin();
+				morph_iter != morph_list.end(); ++morph_iter)
+			{
+				const std::string& morph_name = morph_iter->first;
+				LLPolyMorphData* morph_data = morph_iter->second;
+
+				action_menu = new LLMenuGL(morph_name);
+
+				action_menu->append(new LLMenuItemCallGL("Save OBJ", handle_morph_save_obj, NULL, (void*) morph_data));
+				//action_menu->append(new LLMenuItemCallGL("Load OBJ", handle_morph_load_obj, NULL, (void*) morph_data));
+
+				action_menu->createJumpKeys();
+				lod_menu->appendMenu(action_menu);
+			}
+
+			lod_menu->createJumpKeys();
+			type_menu->appendMenu(lod_menu);
+		}
+		type_menu->createJumpKeys();
+		menu->appendMenu(type_menu);
+	}
+
+	menu->createJumpKeys();
+	menu->updateParent(LLMenuGL::sMenuContainer);
+	//parent_menu->appendMenu(menu);
+
+	LLMenuGL::sMenuContainer->hideMenus();
+	LLFloater* tear_off_menu = LLTearOffMenu::create(menu);
+	tear_off_menu->setFocus(TRUE);
+}
+
 // TomY TODO: Get rid of these?
 class LLViewShowHoverTips : public view_listener_t
 {
@@ -9874,6 +10241,7 @@ void initialize_menus()
 	addMenu(new LLAvatarEnableFreezeEject(), "Avatar.EnableFreezeEject");
 	addMenu(new LLAvatarCopyUUID(), "Avatar.CopyUUID");
 	addMenu(new LLAvatarClientUUID(), "Avatar.ClientID");
+	addMenu(new LLAvatarSaveAsOBJ(), "Avatar.SaveAsOBJ");
 
 	// Object pie menu
 	addMenu(new LLObjectOpen(), "Object.Open");
@@ -9903,6 +10271,7 @@ void initialize_menus()
 	// <edit>
 	addMenu(new LLObjectSaveAs(), "Object.SaveAs");
 	addMenu(new LLObjectImport(), "Object.Import");
+	addMenu(new LLSelectionSaveAsOBJ(), "Object.SaveAsOBJ");
 	// </edit>
 	
 

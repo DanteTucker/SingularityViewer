@@ -68,6 +68,15 @@ BOOL LLXform::isRootEdit() const
 	return (!mParent);
 }
 
+LLXformMatrix::LLXformMatrix (LLXform &form) : LLXform()
+{
+	mPosition = form.getPosition();
+	mRotation = form.getRotation();
+	mScale = form.getScale();
+	mWorldPosition = form.getWorldPosition();
+	mWorldRotation = form.getWorldRotation();
+	mParent = form.getParent();
+}
 LLXformMatrix::~LLXformMatrix()
 {
 }

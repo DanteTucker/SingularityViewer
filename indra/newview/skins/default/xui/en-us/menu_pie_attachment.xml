@@ -20,26 +20,33 @@
 		<on_enable function="Attachment.EnableDetach" />
 	</menu_item_call>
 	<pie_menu label="Tools &gt;" name="Tools &gt;">
+    <menu_item_call enabled="true" label="Copy UUID" mouse_opaque="true" name="CopyUUID">
+      <on_click function="Avatar.CopyUUID" />
+    </menu_item_call>
+    <menu_item_call enabled="true" label="Inspect" mouse_opaque="true" name="Object Inspect">
+      <on_click function="Object.Inspect" />
+      <on_enable function="Object.EnableInspect" />
+    </menu_item_call>
+    <menu_item_separator />
 		<menu_item_call enabled="false" hidden="false" label="S. Count" mouse_opaque="true" name="ScriptCount">
 			<on_click function="Object.ScriptCount" />
 			<on_visible function="Object.VisibleScriptCount" />
 		</menu_item_call>
-		<menu_item_call enabled="true" label="Inspect" mouse_opaque="true" name="Object Inspect">
-			<on_click function="Object.Inspect" />
-			<on_enable function="Object.EnableInspect"/>
-		</menu_item_call>
-		<menu_item_call enabled="false" label="Data" mouse_opaque="true" name="Data">
-    		<on_click function="Object.Data" />
-		</menu_item_call>
-		<menu_item_call enabled="true" label="Derender" mouse_opaque="true" name="Derender">
-			<on_click function="Object.DERENDER" />
-			<on_enable function="Object.EnableDerender" />
-		</menu_item_call>
-		<menu_item_call enabled="false" hidden="false" label="Save As..." mouse_opaque="true"
-							 name="Save As...">
-			<on_click function="Object.SaveAs" />
-			<on_enable function="Object.EnableSaveAs" />
-		</menu_item_call>
+    <menu_item_separator />
+    <menu_item_call enabled="false" label="Data" mouse_opaque="true" name="Data">
+      <on_click function="Object.Data" />
+    </menu_item_call>
+    <pie_menu label="Save &gt;" name="Save &gt;">
+      <menu_item_call enabled="false" hidden="false" label="Save As..." mouse_opaque="true"
+               name="Save As...">
+        <on_click function="Object.SaveAs" />
+        <on_enable function="Object.EnableSaveAs" />
+      </menu_item_call>
+      <menu_item_call enabled="true" hidden="false" label="Save as OBJ" mouse_opaque="true"
+                name="Save as OBJ">
+        <on_click function="Object.SaveAsOBJ" />
+      </menu_item_call>
+    </pie_menu>
 	</pie_menu>
 	<menu_item_call enabled="true" label="Appearance..." name="Appearance...">
 		<on_click function="ShowFloater" userdata="appearance" />

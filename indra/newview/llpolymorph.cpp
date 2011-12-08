@@ -501,7 +501,32 @@ BOOL LLPolyMorphData::setMorphFromMesh(LLPolyMesh *morph)
 
 	return TRUE;
 }
-
+//-----------------------------------------------------------------------------
+// saveOBJ()
+//-----------------------------------------------------------------------------
+BOOL LLPolyMorphData::saveOBJ(LLFILE *fp)
+{
+	if (!fp)
+		return FALSE;
+	
+	LLPolyMesh mesh(mMesh, NULL);
+	
+	LLVector3 *coords     = mesh.getWritableCoords();
+	LLVector3 *normals    = mesh.getWritableNormals();
+	LLVector2 *tex_coords = mesh.getWritableTexCoords();
+	
+	for(U32 vert_index_morph = 0; vert_index_morph < mNumIndices; vert_index_morph++)
+	{
+		S32 vert_index_mesh = mVertexIndices[vert_index_morph];
+	
+		coords[vert_index_mesh]     += mCoords[vert_index_morph];
+		normals[vert_index_mesh]    += mNormals[vert_index_morph];
+		normals[vert_index_mesh].normVec();
+		tex_coords[vert_index_mesh] += mTexCoords[vert_index_morph];
+	}
+	
+	return mesh.saveOBJ(fp);
+}
 //-----------------------------------------------------------------------------
 // LLPolyMorphTargetInfo()
 //-----------------------------------------------------------------------------
