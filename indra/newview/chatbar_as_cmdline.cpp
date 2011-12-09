@@ -103,7 +103,7 @@ bool CmdLineChatCommand::ExecuteClass(const std::string& revised_text, EChatType
 		std::string command;
 		i >> command;
 		command = utf8str_tolower(command);
-	for(auto itr = beginInstances(); itr != endInstances(); itr++)
+	for(instance_iter itr = beginInstances(); itr != endInstances(); itr++)
 	{
 		if(utf8str_tolower((*itr).mCommandName) == command)
 		{

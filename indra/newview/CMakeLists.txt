@@ -1073,7 +1073,7 @@ if (DARWIN)
 
   # Add resource files to the project.
   set(viewer_RESOURCE_FILES
-    ${VIEWER_BRANDING_ID}.icns
+    ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.icns
     macview.r
     gpu_table.txt
     Info-${VIEWER_BRANDING_NAME_CAMELCASE}.plist
@@ -1163,8 +1163,8 @@ if (WINDOWS)
         ${ARTWORK_DIR}/res/lltooltranslate.cur
         ${ARTWORK_DIR}/res/lltoolzoomin.cur
         ${ARTWORK_DIR}/res/lltoolzoomout.cur
-        ${ARTWORK_DIR}/res/snowglobe_icon.BMP
-        ${ARTWORK_DIR}/res/snowglobe_icon.ico
+        ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.bmp
+        ${ARTWORK_DIR}/res/${VIEWER_BRANDING_NAME}.ico
         ${ARTWORK_DIR}/res/resource.h
         ${ARTWORK_DIR}/res/toolbuy.cur
         ${ARTWORK_DIR}/res/toolopen.cur
@@ -1559,7 +1559,7 @@ if (DARWIN)
     PROPERTIES
     OUTPUT_NAME "${product}"
     MACOSX_BUNDLE_INFO_STRING "A stable third-party Second Life viewer."
-    MACOSX_BUNDLE_ICON_FILE "${VIEWER_BRANDING_ID}.icns"
+    MACOSX_BUNDLE_ICON_FILE "${VIEWER_BRANDING_NAME}.icns"
     MACOSX_BUNDLE_GUI_IDENTIFIER "${VIEWER_BRANDING_NAME}"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${viewer_VERSION}"
     MACOSX_BUNDLE_BUNDLE_NAME "${VIEWER_BRANDING_NAME}"

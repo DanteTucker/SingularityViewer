@@ -719,7 +719,7 @@ class LinuxManifest(ViewerManifest):
         return 'partyhat-do-not-run-directly'
     
     def icon_name(self):
-        return "partyhat_icon.png"
+        return "PartyHat.png"
 
     def package_finish(self):
         if 'installer_name' in self.args:

@@ -7,7 +7,7 @@
 #include <queue>
 #include <string.h>
 
-#include <boost\shared_array.hpp>
+#include <boost/shared_array.hpp>
 
 class LLMessageSystem;
 class LLMessageLogEntry
