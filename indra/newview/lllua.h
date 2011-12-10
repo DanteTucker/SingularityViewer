@@ -4,7 +4,7 @@
 #include "llsingleton.h"
 #include "llthread.h"
 
-#include <boost\function.hpp>
+#include <boost/function.hpp>
 #include <map>
 
 // we built the library in a c++ compiler we dont need these

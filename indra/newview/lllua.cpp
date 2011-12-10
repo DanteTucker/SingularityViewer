@@ -140,7 +140,7 @@ void LLLuaTable::push(lua_State* L)
 void LLLuaTable::make_table(lua_State* L, const std::vector< std::string > vec)
 {
 	LLLuaTable table(L);
-	for(auto itr = vec.begin(); itr != vec.end(); itr++)
+	for(std::vector<std::string>::const_iterator itr = vec.begin(); itr != vec.end(); itr++)
 		table.pushvalue(L, (*itr).c_str());
 }
 
@@ -148,7 +148,7 @@ void LLLuaTable::make_table(lua_State* L, const std::vector< std::string > vec)
 void LLLuaTable::make_table(lua_State* L, const std::vector< lua_Number > vec)
 {
 	LLLuaTable table(L);
-	for(auto itr = vec.begin(); itr != vec.end(); itr++)
+	for(std::vector<lua_Number>::const_iterator itr = vec.begin(); itr != vec.end(); itr++)
 		table.pushvalue(L, (*itr));
 }
 
@@ -156,7 +156,7 @@ void LLLuaTable::make_table(lua_State* L, const std::vector< lua_Number > vec)
 void LLLuaTable::make_table(lua_State* L, const std::map< std::string, std::string > map)
 {
 	LLLuaTable table(L);
-	for(auto itr = map.begin(); itr != map.end(); itr++)
+	for(std::map< std::string, std::string >::const_iterator itr = map.begin(); itr != map.end(); itr++)
 	{
 		table.pushkeystring(L, itr->first.c_str());
 		table.pushvalue(L, itr->second.c_str());
@@ -167,7 +167,7 @@ void LLLuaTable::make_table(lua_State* L, const std::map< std::string, std::stri
 void LLLuaTable::make_table(lua_State* L, const std::map< std::string, lua_Number > map)
 {
 	LLLuaTable table(L);
-	for(auto itr = map.begin(); itr != map.end(); itr++)
+	for(std::map< std::string, lua_Number >::const_iterator itr = map.begin(); itr != map.end(); itr++)
 	{
 		table.pushkeystring(L, itr->first.c_str());
 		table.pushvalue(L, itr->second);

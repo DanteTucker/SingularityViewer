@@ -73,7 +73,6 @@ class ViewerManifest(LLManifest):
             self.path("*.ttf")
             self.path("*.txt")
             self.end_prefix("fonts")
-
         # lua
         if self.prefix(src="lua"):
             self.path("*.lua")
@@ -81,35 +80,35 @@ class ViewerManifest(LLManifest):
 
         # skins
         if self.prefix(src="skins"):
-                self.path("paths.xml")
-                # include the entire textures directory recursively
-                if self.prefix(src="default/textures"):
-                        self.path("*.tga")
-                        self.path("*.j2c")
-                        self.path("*.jpg")
-                        self.path("*.png")
-                        self.path("textures.xml")
-                        self.end_prefix("default/textures")
-                self.path("default/xui/*/*.xml")
-                self.path("Default.xml")
-                self.path("default/*.xml")
-                if self.prefix(src="dark/textures"):
-                        self.path("*.tga")
-                        self.path("*.j2c")
-                        self.path("*.jpg")
-                        self.path("*.png")
-                        self.path("textures.xml")
-                        self.end_prefix("dark/textures")
-                self.path("dark.xml")
-                self.path("dark/*.xml")
-                
-                # Local HTML files (e.g. loading screen)
-                if self.prefix(src="*/html"):
-                        self.path("*.png")
-                        self.path("*/*/*.html")
-                        self.path("*/*/*.gif")
-                        self.end_prefix("*/html")
-                self.end_prefix("skins")
+            self.path("paths.xml")
+            # include the entire textures directory recursively
+            if self.prefix(src="default/textures"):
+                    self.path("*.tga")
+                    self.path("*.j2c")
+                    self.path("*.jpg")
+                    self.path("*.png")
+                    self.path("textures.xml")
+                    self.end_prefix("default/textures")
+            self.path("default/xui/*/*.xml")
+            self.path("Default.xml")
+            self.path("default/*.xml")
+            if self.prefix(src="dark/textures"):
+                    self.path("*.tga")
+                    self.path("*.j2c")
+                    self.path("*.jpg")
+                    self.path("*.png")
+                    self.path("textures.xml")
+                    self.end_prefix("dark/textures")
+            self.path("dark.xml")
+            self.path("dark/*.xml")
+            
+            # Local HTML files (e.g. loading screen)
+            if self.prefix(src="*/html"):
+                    self.path("*.png")
+                    self.path("*/*/*.html")
+                    self.path("*/*/*.gif")
+                    self.end_prefix("*/html")
+            self.end_prefix("skins")
         
         # Files in the newview/ directory
         self.path("gpu_table.txt")
@@ -191,7 +190,7 @@ class WindowsManifest(ViewerManifest):
                                'llplugin', 'slplugin', self.args['configuration'], "SLPlugin.exe"),
                   "SLPlugin.exe")
         
-      	# need to get the kdu dll from any of the build directories as well
+      # need to get the kdu dll from any of the build directories as well
         #~ try:
             #~ self.path(self.find_existing_file('../llkdu/%s/llkdu.dll' % self.args['configuration'],
                 #~ '../../libraries/i686-win32/lib/release/llkdu.dll'), 
@@ -210,7 +209,7 @@ class WindowsManifest(ViewerManifest):
             self.end_prefix()
 
         # For use in crash reporting (generates minidumps)
-        self.path("dbghelp.dll")
+        # self.path("dbghelp.dll")
 
         # For using FMOD for sound... DJS
         if self.prefix(src="../../libraries/i686-win32/lib/release", dst=""):
@@ -469,100 +468,100 @@ class DarwinManifest(ViewerManifest):
             if self.prefix(src="", dst="Resources"):
                 super(DarwinManifest, self).construct()
 
-                if self.prefix("cursors_mac"):
-                    self.path("*.tif")
-                    self.end_prefix("cursors_mac")
+            if self.prefix("cursors_mac"):
+                self.path("*.tif")
+                self.end_prefix("cursors_mac")
 
-                self.path("licenses-mac.txt", dst="licenses.txt")
-                self.path("featuretable_mac.txt")
-                self.path("SecondLife.nib")
+            self.path("licenses-mac.txt", dst="licenses.txt")
+            self.path("featuretable_mac.txt")
+            self.path("SecondLife.nib")
 
-   			  # SG:TODO
-                self.path("../newview/res/PartyHat.icns", dst="PartyHat.icns")
+            # SG:TODO
+            self.path("../newview/res/PartyHat.icns", dst="PartyHat.icns")
 
-                # Translations
-                self.path("English.lproj")
-                self.path("German.lproj")
-                self.path("Japanese.lproj")
-                self.path("Korean.lproj")
-                self.path("da.lproj")
-                self.path("es.lproj")
-                self.path("fr.lproj")
-                self.path("hu.lproj")
-                self.path("it.lproj")
-                self.path("nl.lproj")
-                self.path("pl.lproj")
-                self.path("pt.lproj")
-                self.path("ru.lproj")
-                self.path("tr.lproj")
-                self.path("uk.lproj")
-                self.path("zh-Hans.lproj")
+            # Translations
+            self.path("English.lproj")
+            self.path("German.lproj")
+            self.path("Japanese.lproj")
+            self.path("Korean.lproj")
+            self.path("da.lproj")
+            self.path("es.lproj")
+            self.path("fr.lproj")
+            self.path("hu.lproj")
+            self.path("it.lproj")
+            self.path("nl.lproj")
+            self.path("pl.lproj")
+            self.path("pt.lproj")
+            self.path("ru.lproj")
+            self.path("tr.lproj")
+            self.path("uk.lproj")
+            self.path("zh-Hans.lproj")
 
-                # SLVoice and vivox lols
-                self.path("vivox-runtime/universal-darwin/libalut.dylib", "libalut.dylib")
-                self.path("vivox-runtime/universal-darwin/libopenal.dylib", "libopenal.dylib")
-                self.path("vivox-runtime/universal-darwin/libortp.dylib", "libortp.dylib")
-                self.path("vivox-runtime/universal-darwin/libvivoxsdk.dylib", "libvivoxsdk.dylib")
-                self.path("vivox-runtime/universal-darwin/SLVoice", "SLVoice")
+            # SLVoice and vivox lols
+            self.path("vivox-runtime/universal-darwin/libalut.dylib", "libalut.dylib")
+            self.path("vivox-runtime/universal-darwin/libopenal.dylib", "libopenal.dylib")
+            self.path("vivox-runtime/universal-darwin/libortp.dylib", "libortp.dylib")
+            self.path("vivox-runtime/universal-darwin/libvivoxsdk.dylib", "libvivoxsdk.dylib")
+            self.path("vivox-runtime/universal-darwin/SLVoice", "SLVoice")
 
-		self.path("../llcommon/" + self.args['configuration'] + "/libllcommon.dylib", "libllcommon.dylib")
-                
-                libfile = "lib%s.dylib"
-                libdir = "../../libraries/universal-darwin/lib_release"
+            self.path("../llcommon/" + self.args['configuration'] + "/libllcommon.dylib", "libllcommon.dylib")
+            
+            libfile = "lib%s.dylib"
+            libdir = "../../libraries/universal-darwin/lib_release"
 
-                for libfile in ("libapr-1.0.3.7.dylib",
-                                "libaprutil-1.0.3.8.dylib",
-                                "libexpat.0.5.0.dylib"):
-                    self.path(os.path.join(libdir, libfile), libfile)
+            for libfile in ("libapr-1.0.3.7.dylib",
+                            "libaprutil-1.0.3.8.dylib",
+                            "libexpat.0.5.0.dylib"):
+                self.path(os.path.join(libdir, libfile), libfile)
 
-                # For using FMOD for sound...but, fmod is proprietary so some might not use it...
-                try:
-                    self.path(self.args['configuration'] + "/libfmodwrapper.dylib", "libfmodwrapper.dylib")
-                    pass
-                except:
-                    print "Skipping libfmodwrapper.dylib - not found"
-                    pass
+            # For using FMOD for sound...but, fmod is proprietary so some might not use it...
+            try:
+                self.path(self.args['configuration'] + "/libfmodwrapper.dylib", "libfmodwrapper.dylib")
+                pass
+            except:
+                print "Skipping libfmodwrapper.dylib - not found"
+                pass
 
-                # our apps
-                try:
-                  self.path("../mac_crash_logger/" + self.args['configuration'] + "/mac-crash-logger.app", "mac-crash-logger.app")
-                  self.path("../mac_updater/" + self.args['configuration'] + "/mac-updater.app", "mac-updater.app")
-                except:
-                	pass
+            # our apps
+            try:
+              self.path("../mac_crash_logger/" + self.args['configuration'] + "/mac-crash-logger.app", "mac-crash-logger.app")
+              self.path("../mac_updater/" + self.args['configuration'] + "/mac-updater.app", "mac-updater.app")
+            except:
+                pass
 
-                # plugin launcher
-                self.path("../llplugin/slplugin/" + self.args['configuration'] + "/SLPlugin.app", "SLPlugin.app")
-                
-                # dependencies on shared libs
-                mac_crash_logger_res_path = self.dst_path_of("mac-crash-logger.app/Contents/Resources")
-                slplugin_res_path = self.dst_path_of("SLPlugin.app/Contents/Resources")
-                for libfile in ("libllcommon.dylib",
-                                "libapr-1.0.3.7.dylib",
-                                "libaprutil-1.0.3.8.dylib",
-                                "libexpat.0.5.0.dylib"):
-                    target_lib = os.path.join('../../..', libfile)
-                    self.run_command("ln -sf %(target)r %(link)r" %
-                                     {'target': target_lib,
-                                      'link' : os.path.join(slplugin_res_path, libfile)}
-                                     )
-                    #self.run_command("ln -sf %(target)r %(link)r" %
-                    #                 {'target': target_lib,
-                    #                  'link' : os.path.join(mac_crash_logger_res_path, libfile)}
-                    #                 )
+            # plugin launcher
+            self.path("../llplugin/slplugin/" + self.args['configuration'] + "/SLPlugin.app", "SLPlugin.app")
+            
+            # dependencies on shared libs
+            mac_crash_logger_res_path = self.dst_path_of("mac-crash-logger.app/Contents/Resources")
+            slplugin_res_path = self.dst_path_of("SLPlugin.app/Contents/Resources")
+            for libfile in ("libllcommon.dylib",
+                            "libapr-1.0.3.7.dylib",
+                            "libaprutil-1.0.3.8.dylib",
+                            "libexpat.0.5.0.dylib"):
+                target_lib = os.path.join('../../..', libfile)
+                self.run_command("ln -sf %(target)r %(link)r" %
+                                 {'target': target_lib,
+                                  'link' : os.path.join(slplugin_res_path, libfile)}
+                                 )
+                #self.run_command("ln -sf %(target)r %(link)r" %
+                #                 {'target': target_lib,
+                #                  'link' : os.path.join(mac_crash_logger_res_path, libfile)}
+                #                 )
 
-                # plugins
-                if self.prefix(src="", dst="llplugin"):
-                    self.path("../plugins/filepicker/" + self.args['configuration'] + "/basic_plugin_filepicker.dylib", "basic_plugin_filepicker.dylib")
-                    self.path("../plugins/quicktime/" + self.args['configuration'] + "/media_plugin_quicktime.dylib", "media_plugin_quicktime.dylib")
-                    self.path("../plugins/webkit/" + self.args['configuration'] + "/media_plugin_webkit.dylib", "media_plugin_webkit.dylib")
-                    self.path("../../libraries/universal-darwin/lib_release/libllqtwebkit.dylib", "libllqtwebkit.dylib")
+            # plugins
+            if self.prefix(src="", dst="llplugin"):
+                self.path("../plugins/filepicker/" + self.args['configuration'] + "/basic_plugin_filepicker.dylib", "basic_plugin_filepicker.dylib")
+                self.path("../plugins/quicktime/" + self.args['configuration'] + "/media_plugin_quicktime.dylib", "media_plugin_quicktime.dylib")
+                self.path("../plugins/webkit/" + self.args['configuration'] + "/media_plugin_webkit.dylib", "media_plugin_webkit.dylib")
+                self.path("../../libraries/universal-darwin/lib_release/libllqtwebkit.dylib", "libllqtwebkit.dylib")
 
-                    self.end_prefix("llplugin")              
+                self.end_prefix("llplugin")              
 
-                # command line arguments for connecting to the proper grid
-                self.put_in_file(self.flags_list(), 'arguments.txt')
+            # command line arguments for connecting to the proper grid
+            self.put_in_file(self.flags_list(), 'arguments.txt')
 
-                self.end_prefix("Resources")
+            self.end_prefix("Resources")
 
             self.end_prefix("Contents")
 
@@ -628,9 +627,9 @@ class DarwinManifest(ViewerManifest):
         # one for release candidate and one for first look. Any other channels
         # will use the release .DS_Store, and will look broken.
         # - Ambroff 2008-08-20
-		# Added a .DS_Store for snowglobe - Merov 2009-06-17
-		
-		# We have a single branded installer for all snowglobe channels so snowglobe logic is a bit different
+# Added a .DS_Store for snowglobe - Merov 2009-06-17
+
+# We have a single branded installer for all snowglobe channels so snowglobe logic is a bit different
         if (self.app_name()=="Snowglobe"):
             dmg_template = os.path.join ('installers', 'darwin', 'snowglobe-dmg')
         else:
@@ -720,7 +719,7 @@ class LinuxManifest(ViewerManifest):
         return 'partyhat-do-not-run-directly'
     
     def icon_name(self):
-        return "partyhat_icon.png"
+        return "PartyHat.png"
 
     def package_finish(self):
         if 'installer_name' in self.args:
