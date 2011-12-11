@@ -198,9 +198,15 @@ void LLFloaterChat::updateConsoleVisibility()
 							|| (getHost() && getHost()->isMinimized() ));	// are we hosted in a minimized floater?
 }
 
-void add_timestamped_line(LLViewerTextEditor* edit, LLChat chat, const LLColor4& color)
+void add_timestamped_line(LLViewerTextEditor* edit, LLChat chat, const LLColor4& _color)
 {
 	std::string line = chat.mText;
+	LLColor4 color = _color;
+
+	size_t itr = chat.mText.find_first_of(':');
+	if(chat.mText.substr(itr + 2, 1) == ">") //<edit/>
+		color = LLColor4::green4;
+
 	bool prepend_newline = true;
 	if (gSavedSettings.getBOOL("ChatShowTimestamps"))
 	{
@@ -482,6 +488,9 @@ void LLFloaterChat::addChat(const LLChat& chat,
 		// We display anything if it's not an IM. If it's an IM, check pref...
 		if	( !from_instant_message || gSavedSettings.getBOOL("IMInChatConsole") ) 
 		{
+			size_t itr = chat.mText.find_first_of(':');
+			if(chat.mText.substr(itr + 2, 1) == ">") //<edit/>
+				text_color = LLColor4::green4;
 			gConsole->addConsoleLine(chat.mText, text_color);
 		}
 	}
