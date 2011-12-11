@@ -205,7 +205,7 @@ void add_timestamped_line(LLViewerTextEditor* edit, LLChat chat, const LLColor4&
 
 	size_t itr = chat.mText.find_first_of(':');
 	if(chat.mText.substr(itr + 2, 1) == ">") //<edit/>
-		color = LLColor4::green4;
+		color = LLColor4(0.37647f, 0.48235f, 0.10980f);
 
 	bool prepend_newline = true;
 	if (gSavedSettings.getBOOL("ChatShowTimestamps"))
@@ -490,7 +490,7 @@ void LLFloaterChat::addChat(const LLChat& chat,
 		{
 			size_t itr = chat.mText.find_first_of(':');
 			if(chat.mText.substr(itr + 2, 1) == ">") //<edit/>
-				text_color = LLColor4::green4;
+				text_color = LLColor4(0.37647f, 0.48235f, 0.10980f);
 			gConsole->addConsoleLine(chat.mText, text_color);
 		}
 	}
