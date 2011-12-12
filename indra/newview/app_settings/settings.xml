@@ -5880,6 +5880,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>RadarChatChannel</key>
+    <map>
+      <key>Comment</key>
+      <string>Channel to put keys on when requested or agent enters sim</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>S32</string>
+      <key>Value</key>
+      <integer>-777777777</integer>
+    </map>
     <key>FloaterLandRect5</key>
     <map>
       <key>Comment</key>

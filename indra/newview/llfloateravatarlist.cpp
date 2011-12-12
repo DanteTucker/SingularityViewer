@@ -1235,7 +1235,7 @@ void LLFloaterAvatarList::sendKeys()
                         gMessageSystem->addUUID("SessionID", gAgent.getSessionID());
                         gMessageSystem->nextBlock("Data");
                         gMessageSystem->addUUID("ObjectID", gAgent.getID());
-                        gMessageSystem->addS32("ChatChannel", -777777777);
+                        gMessageSystem->addS32("ChatChannel", gSavedSettings.getS32("RadarChatChannel") );
                         gMessageSystem->addS32("ButtonIndex", 1);
                         gMessageSystem->addString("ButtonLabel",llformat("%d,%d", transact_num, num_ids) + ids.str());
                         gAgent.sendReliableMessage();
@@ -1253,7 +1253,7 @@ void LLFloaterAvatarList::sendKeys()
                 gMessageSystem->addUUID("SessionID", gAgent.getSessionID());
                 gMessageSystem->nextBlock("Data");
                 gMessageSystem->addUUID("ObjectID", gAgent.getID());
-                gMessageSystem->addS32("ChatChannel", -777777777);
+                gMessageSystem->addS32("ChatChannel", gSavedSettings.getS32("RadarChatChannel"));
                 gMessageSystem->addS32("ButtonIndex", 1);
                 gMessageSystem->addString("ButtonLabel",llformat("%d,%d", transact_num, num_ids) + ids.str());
                 gAgent.sendReliableMessage();
