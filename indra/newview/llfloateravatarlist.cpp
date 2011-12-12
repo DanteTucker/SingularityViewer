@@ -222,7 +222,6 @@ LLFloaterAvatarList::LLFloaterAvatarList() :  LLFloater(std::string("radar"))
 	llassert_always(sInstance == NULL);
 	sInstance = this;
 	mUpdateRate = gSavedSettings.getU32("RadarUpdateRate") * 3 + 3;
-	mSoundTriggerConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_SoundTrigger, sound_trigger_hook);
 }
 
 LLFloaterAvatarList::~LLFloaterAvatarList()

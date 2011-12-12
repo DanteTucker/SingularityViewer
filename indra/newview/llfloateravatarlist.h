@@ -189,7 +189,6 @@ public:
 
 private:
 	static LLFloaterAvatarList* sInstance;
-	boost::signals2::connection mSoundTriggerConnection;
 public:
 	static LLFloaterAvatarList* getInstance() { return sInstance; }
 private:
