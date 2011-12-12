@@ -96,7 +96,7 @@
 //
 LLColor4 get_text_color(const LLChat& chat);
 
-#define GREENTEXT LLColor(0.47f, 0.6f, 0.1333333f)
+#define GREENTEXT LLColor4(0.47f, 0.6f, 0.1333333f)
 
 //
 // Member Functions
