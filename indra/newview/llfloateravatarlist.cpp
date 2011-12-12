@@ -1192,7 +1192,7 @@ void LLFloaterAvatarList::onClickGetKey(void *userdata)
 
 	gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
 }
-//static
+
 void LLFloaterAvatarList::sendKeys()
 {
 	 LLViewerRegion* regionp = gAgent.getRegion();

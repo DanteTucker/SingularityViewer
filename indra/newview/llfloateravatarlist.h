@@ -185,7 +185,7 @@ public:
 	static void lookAtAvatar(LLUUID &uuid);
 
 	static void sound_trigger_hook(LLMessageSystem* msg);
-	static void sendKeys();
+	void sendKeys();
 
 private:
 	static LLFloaterAvatarList* sInstance;
