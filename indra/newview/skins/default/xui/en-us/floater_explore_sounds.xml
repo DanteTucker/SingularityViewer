@@ -34,15 +34,17 @@
 	</scroll_list>
 	
 	<button bottom="31" follows="bottom|left" height="20" label="Look At" name="look_at_btn"
-		left="10" width="95"/>
+		    left="10" width="95"/>
 	<button bottom_delta="0" follows="bottom|left" height="20" label="Play Locally" name="play_locally_btn"
-		left_delta="100" width="95"/>
+		    left_delta="100" width="95"/>
 	<button bottom_delta="0" follows="bottom|left" height="20" label="Play In World" name="play_ambient_btn" 
 	     	left_delta="100" width="95"/>
-
 	<button bottom="6" follows="bottom|left" height="20" label="Stop" name="stop_btn"
 	     	left="10" width="95"/>
-    	<button bottom_delta="0" follows="bottom|left" height="20" label="Add To Blacklist" name="bl_btn" 
-	     	left_delta="100" width="195"/>
-
+  <button bottom_delta="0" follows="bottom|left" height="20" label="Add To BL" name="bl_btn" 
+	     	left_delta="100" width="95"/>
+  <button bottom_delta="0" follows="bottom|left" height="20" label="Open" name="open_btn"
+	     left_delta="100" width="95"/>
+  <button bottom_delta="0" follows="bottom|left" height="20" label="Copy UUID" name="copy_uuid_btn"
+	     left_delta="100" width="95"/>
 </floater>

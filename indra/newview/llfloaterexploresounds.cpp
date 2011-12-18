@@ -13,6 +13,8 @@
 #include "llfloaterchat.h"
 #include "llfloaterblacklist.h"
 
+#include "lllocalinventory.h"
+
 static const size_t num_collision_sounds = 29;
 const LLUUID collision_sounds[num_collision_sounds] =
 {
@@ -79,6 +81,8 @@ BOOL LLFloaterExploreSounds::postBuild(void)
 
 	childSetAction("play_locally_btn", handle_play_locally, this);
 	childSetAction("look_at_btn", handle_look_at, this);
+	childSetAction("open_btn", handle_open, this);
+	childSetAction("copy_uuid_btn", handle_copy_uuid, this);
 	childSetAction("stop_btn", handle_stop, this);
 	childSetAction("bl_btn", blacklistSound, this);
 
@@ -361,6 +365,40 @@ void LLFloaterExploreSounds::handle_stop(void* user_data)
 			item.mAudioSource->play(LLUUID::null);
 		}
 	}
+}
+
+// static
+void LLFloaterExploreSounds::handle_open(void* user_data)
+{
+	LLFloaterExploreSounds* floater = (LLFloaterExploreSounds*)user_data;
+	LLScrollListCtrl* list = floater->getChild<LLScrollListCtrl>("sound_list");
+	std::vector<LLScrollListItem*> selection = list->getAllSelected();
+	std::vector<LLScrollListItem*>::iterator selection_iter = selection.begin();
+	std::vector<LLScrollListItem*>::iterator selection_end = selection.end();
+	std::vector<LLUUID> asset_list;
+	for( ; selection_iter != selection_end; ++selection_iter)
+	{
+		LLSoundHistoryItem item = floater->getItem((*selection_iter)->getValue());
+		if(item.mID.isNull()) continue;
+		// Unique assets only
+		if(std::find(asset_list.begin(), asset_list.end(), item.mAssetID) == asset_list.end())
+		{
+			asset_list.push_back(item.mAssetID);
+			LLUUID inv_item = LLLocalInventory::addItem(item.mAssetID.asString(), LLAssetType::AT_SOUND, item.mAssetID, true);
+		}
+	}
+}
+
+// static
+void LLFloaterExploreSounds::handle_copy_uuid(void* user_data)
+{
+	LLFloaterExploreSounds* floater = (LLFloaterExploreSounds*)user_data;
+	LLScrollListCtrl* list = floater->getChild<LLScrollListCtrl>("sound_list");
+	LLUUID selection = list->getSelectedValue().asUUID(); // Single item only
+	LLSoundHistoryItem item = floater->getItem(selection);
+	if(item.mID.isNull()) return;
+
+	gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(item.mAssetID.asString()));
 }
 
 void LLFloaterExploreSounds::blacklistSound(void* user_data)
