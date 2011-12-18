@@ -1,5 +1,5 @@
 /**
- * @file aWavefront.cpp
+ * @file awavefront.cpp
  * @brief A system which allows saving in-world objects to Wavefront .OBJ files for offline texturizing/shading.
  * @author Apelsin
  * 
@@ -7,7 +7,7 @@
  *  
  */
 #include "llviewerprecompiledheaders.h"
-#include "aWavefront.h"
+#include "awavefront.h"
 #include "llviewercontrol.h"
 #include "llvoavatardefines.h"
 #include "llvolume.h"

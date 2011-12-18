@@ -70,7 +70,7 @@ include_directories(
     )
 
 set(viewer_SOURCE_FILES
-	aWavefront.cpp
+	awavefront.cpp
 	lllua.cpp
 	llluabindings.cpp
 	llluaconsole.cpp
@@ -570,7 +570,7 @@ set(viewer_HEADER_FILES
     CMakeLists.txt
     ViewerInstall.cmake
 	
-	aWavefront.h
+	awavefront.h
 	luna.h
     lllua.h
 	llluabindings.h

@@ -1,5 +1,5 @@
 /**
- * @file aWavefront.h
+ * @file awavefront.h
  * @brief A system which allows saving in-world objects to Wavefront .OBJ files for offline texturizing/shading.
  * @author Apelsin
  * 

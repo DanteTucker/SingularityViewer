@@ -43,7 +43,7 @@
 #include "llpolymorph.h"
 #include "lljoint.h"
 
-//#include "aWavefront.h" //conflicts with stuff
+//#include "awavefront.h" //conflicts with stuff
 
 //#include "lldarray.h"
 
