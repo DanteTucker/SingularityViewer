@@ -222,7 +222,6 @@ LLFloaterAvatarList::LLFloaterAvatarList() :  LLFloater(std::string("radar"))
 	llassert_always(sInstance == NULL);
 	sInstance = this;
 	mUpdateRate = gSavedSettings.getU32("RadarUpdateRate") * 3 + 3;
-	mSoundTriggerConnection = gMessageSystem->addHandlerFuncFast(_PREHASH_SoundTrigger, sound_trigger_hook);
 }
 
 LLFloaterAvatarList::~LLFloaterAvatarList()
@@ -1193,7 +1192,7 @@ void LLFloaterAvatarList::onClickGetKey(void *userdata)
 
 	gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
 }
-//static
+
 void LLFloaterAvatarList::sendKeys()
 {
 	 LLViewerRegion* regionp = gAgent.getRegion();
@@ -1236,7 +1235,7 @@ void LLFloaterAvatarList::sendKeys()
                         gMessageSystem->addUUID("SessionID", gAgent.getSessionID());
                         gMessageSystem->nextBlock("Data");
                         gMessageSystem->addUUID("ObjectID", gAgent.getID());
-                        gMessageSystem->addS32("ChatChannel", -777777777);
+                        gMessageSystem->addS32("ChatChannel", gSavedSettings.getS32("RadarChatChannel") );
                         gMessageSystem->addS32("ButtonIndex", 1);
                         gMessageSystem->addString("ButtonLabel",llformat("%d,%d", transact_num, num_ids) + ids.str());
                         gAgent.sendReliableMessage();
@@ -1254,7 +1253,7 @@ void LLFloaterAvatarList::sendKeys()
                 gMessageSystem->addUUID("SessionID", gAgent.getSessionID());
                 gMessageSystem->nextBlock("Data");
                 gMessageSystem->addUUID("ObjectID", gAgent.getID());
-                gMessageSystem->addS32("ChatChannel", -777777777);
+                gMessageSystem->addS32("ChatChannel", gSavedSettings.getS32("RadarChatChannel"));
                 gMessageSystem->addS32("ButtonIndex", 1);
                 gMessageSystem->addString("ButtonLabel",llformat("%d,%d", transact_num, num_ids) + ids.str());
                 gAgent.sendReliableMessage();

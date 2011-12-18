@@ -5880,6 +5880,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>RadarChatChannel</key>
+    <map>
+      <key>Comment</key>
+      <string>Channel to put keys on when requested or agent enters sim</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>S32</string>
+      <key>Value</key>
+      <integer>-777777777</integer>
+    </map>
     <key>FloaterLandRect5</key>
     <map>
       <key>Comment</key>
@@ -12715,6 +12726,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+  <key>OBJExportSwapYZ</key>
+  <map>
+    <key>Comment</key>
+    <string>OBJ Files saved swap Y and Z axes (useful for Cinema 4D users)</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
     <key>SpeakingColor</key>
     <map>
       <key>Comment</key>

@@ -185,17 +185,16 @@ public:
 	static void lookAtAvatar(LLUUID &uuid);
 
 	static void sound_trigger_hook(LLMessageSystem* msg);
-	static void sendKeys();
+	void sendKeys();
 
 private:
 	static LLFloaterAvatarList* sInstance;
-	boost::signals2::connection mSoundTriggerConnection;
 public:
 	static LLFloaterAvatarList* getInstance() { return sInstance; }
 private:
 	// when a line editor loses keyboard focus, it is committed.
 	// commit callbacks are named onCommitWidgetName by convention.
-	//void onCommitBaz(LLUICtrl* ctrl, void *userdata);
+	//void onCommitBaaaz(LLUICtrl* ctrl, void *userdata);
 	
 	enum AVATARS_COLUMN_ORDER
 	{

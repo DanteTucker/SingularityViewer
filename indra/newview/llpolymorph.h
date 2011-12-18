@@ -54,10 +54,10 @@ public:
 	LLPolyMorphData(const LLPolyMorphData &rhs);
 
 	BOOL			loadBinary(LLFILE* fp, LLPolyMeshSharedData *mesh);
+	BOOL			saveOBJ(LLFILE *fp);
 	const std::string& getName() { return mName; }
 
 	BOOL			saveLLM(LLFILE *fp);
-	BOOL			saveOBJ(LLFILE *fp);
 	BOOL			setMorphFromMesh(LLPolyMesh *morph);
 
 public:
