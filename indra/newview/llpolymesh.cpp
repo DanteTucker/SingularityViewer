@@ -1212,76 +1212,6 @@ BOOL LLPolyMesh::saveLLM(LLFILE *fp)
 }
 
 //-----------------------------------------------------------------------------
-// LLPolyMesh::saveOBJ()
-//-----------------------------------------------------------------------------
-BOOL LLPolyMesh::saveOBJ(LLFILE *fp)
-{
-	if (!fp)
-		return FALSE;
-
-	// If it's an LOD mesh, the LOD vertices are usually at the start of the
-	// list of vertices, so the number of vertices is just that subset.
-	// We could also write out the rest of the vertices in case someone wants
-	// to choose new vertices for the LOD mesh, but that may confuse some people.
-
-	int nverts = mSharedData->mNumVertices;
-	int nfaces = mSharedData->mNumFaces;
-	int i;
-
-	LLVector4* coords = getWritableCoords();
-	for ( i=0; i<nverts; i++) {
-		std::string outstring = llformat("v %f %f %f\n",
-										 coords[i][0],
-										 coords[i][1],
-										 coords[i][2]);
-		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
-		{
-			llwarns << "Short write" << llendl;
-		}
-	}
-
-	LLVector4* normals = getWritableNormals();
-	for ( i=0; i<nverts; i++) {
-		std::string outstring = llformat("vn %f %f %f\n",
-										 normals[i][0],
-										 normals[i][1],
-										 normals[i][2]);
-		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
-		{
-			llwarns << "Short write" << llendl;
-		}
-	}
-
-	LLVector2* tex = getWritableTexCoords();
-	for ( i=0; i<nverts; i++) {
-		std::string outstring = llformat("vt %f %f\n",
-										 tex[i][0],
-										 tex[i][1]);
-		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
-		{
-			llwarns << "Short write" << llendl;
-		}
-	}
-
-	LLPolyFace* faces = getFaces();
-	for ( i=0; i<nfaces; i++) {
-		S32 f1 = faces[i][0] + 1;
-		S32 f2 = faces[i][1] + 1;
-		S32 f3 = faces[i][2] + 1;
-		std::string outstring = llformat("f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-										 f1, f1, f1,
-										 f2, f2, f2,
-										 f3, f3, f3);
-		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
-		{
-			llwarns << "Short write" << llendl;
-		}
-	}
-
-	return TRUE;
-}
-
-//-----------------------------------------------------------------------------
 // LLPolyMesh::loadOBJ()
 //-----------------------------------------------------------------------------
 BOOL LLPolyMesh::loadOBJ(LLFILE *fp)
@@ -1975,5 +1905,97 @@ LLPolyMorphData *clone_morph_param_cleavage(const LLPolyMorphData *src_data,
         }
         return cloned_morph_data;
 }
+//-----------------------------------------------------------------------------
+// LLPolyMesh::saveOBJ()
+//-----------------------------------------------------------------------------
+S32 LLPolyMesh::saveOBJ(LLFILE *fp, int index)
+{
+	if (!fp)
+		return -1;
 
+	// If it's an LOD mesh, the LOD vertices are usually at the start of the
+	// list of vertices, so the number of vertices is just that subset.
+	// We could also write out the rest of the vertices in case someone wants
+	// to choose new vertices for the LOD mesh, but that may confuse some people.
+
+	int nverts = mSharedData->mNumVertices;
+	int nfaces = mSharedData->mNumFaces;
+	int i;
+
+	LLVector4* coords = getWritableCoords();
+	for ( i=0; i<nverts; i++) {
+		std::string outstring = llformat("v %f %f %f\n",
+																		 coords[i][0],
+																		 coords[i][1],
+																		 coords[i][2]);
+		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
+		{
+			llwarns << "Short write" << llendl;
+		}
+	}
+
+	LLVector4* normals = getWritableNormals();
+	for ( i=0; i<nverts; i++) {
+		std::string outstring = llformat("vn %f %f %f\n",
+																		 normals[i][0],
+																		 normals[i][1],
+																		 normals[i][2]);
+		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
+		{
+			llwarns << "Short write" << llendl;
+		}
+	}
+
+	LLVector2* tex = getWritableTexCoords();
+	for ( i=0; i<nverts; i++) {
+		std::string outstring = llformat("vt %f %f\n",
+																		 tex[i][0],
+																		 tex[i][1]);
+		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
+		{
+			llwarns << "Short write" << llendl;
+		}
+	}
+
+	LLPolyFace* faces = getFaces();
+	for ( i=0; i<nfaces; i++) {
+		S32 f1 = faces[i][0] + index + 1;
+		S32 f2 = faces[i][1] + index + 1;
+		S32 f3 = faces[i][2] + index + 1;
+		std::string outstring = llformat("f %d/%d/%d %d/%d/%d %d/%d/%d\n",
+																		 f1, f1, f1,
+																		 f2, f2, f2,
+																		 f3, f3, f3);
+		if (fwrite(outstring.c_str(), 1, outstring.length(), fp) != outstring.length())
+		{
+			llwarns << "Short write" << llendl;
+		}
+	}
+
+	return index + (i - 1) * 3 + 1;
+}
+//disabled due to inclusion conflicts
+/*Wavefront LLPolyMesh::asOBJ()
+{
+	Wavefront::vert_t verts = Wavefront::vert_t();
+	Wavefront::tri_t tris = Wavefront::tri_t();
+
+	int nverts = mSharedData->mNumVertices;
+	int nfaces = mSharedData->mNumFaces;
+	int i;
+
+	LLVector3* coords = getWritableCoords();
+	LLVector2* tex = getWritableTexCoords();
+	for (i = 0; i < nverts; i++)
+		verts.push_back(std::pair<LLVector3, LLVector2>(coords[i], tex[i]));
+	LLPolyFace* faces = getFaces();
+	for (i = 0; i < nfaces; i++) {
+		Wavefront::tri t;
+		t.v0 = faces[i][0] + 1;
+		t.v1 = faces[i][1] + 1;
+		t.v2 = faces[i][2] + 1;
+		tris.push_back(t);
+	}
+	return Wavefront(verts, tris);
+}*/
 // End

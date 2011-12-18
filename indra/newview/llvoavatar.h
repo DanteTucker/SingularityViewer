@@ -366,6 +366,11 @@ public:
 	LLViewerJoint* 		mWristLeftp;
 	LLViewerJoint* 		mWristRightp;
 
+	typedef std::map<S32,std::string> lod_mesh_map_t;
+	typedef std::map<std::string,lod_mesh_map_t> mesh_info_t;
+
+	static void getMeshInfo (mesh_info_t* mesh_info);
+
 	//--------------------------------------------------------------------
 	// XML parse tree
 	//--------------------------------------------------------------------
@@ -661,6 +666,7 @@ private:
 
 	typedef std::multimap<std::string, LLPolyMesh*> polymesh_map_t;
 	polymesh_map_t 									mMeshes;
+public:
 	std::vector<LLViewerJoint *> 					mMeshLOD;
 
 	//--------------------------------------------------------------------
@@ -699,8 +705,6 @@ private:
 public:
 	typedef std::map<S32, std::string> lod_mesh_map_t;
 	typedef std::map<std::string, lod_mesh_map_t> mesh_info_t;
-
-	static void getMeshInfo(mesh_info_t* mesh_info);
 
 	//--------------------------------------------------------------------
 	// Clothing colors (convenience functions to access visual parameters)

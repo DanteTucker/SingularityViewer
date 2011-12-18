@@ -35,6 +35,10 @@
 
 #include "llmenugl.h"
 
+#include "llpolymesh.h"
+#include "lltexlayer.h"
+#include "llvoavatar.h"
+
 class LLUICtrl;
 class LLView;
 class LLParcelSelection;
@@ -104,6 +108,7 @@ bool handle_sit_or_stand();
 bool handle_give_money_dialog();
 bool handle_object_open();
 bool handle_go_to();
+
 
 // Export to XML or Collada
 void handle_export_selected( void * );

@@ -296,7 +296,7 @@ BOOL LLPolyMorphData::saveOBJ(LLFILE *fp)
 		tex_coords[vert_index_mesh] += mTexCoords[vert_index_morph];
 	}
 
-	return mesh.saveOBJ(fp);
+	return mesh.saveOBJ(fp, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -501,7 +501,9 @@ BOOL LLPolyMorphData::setMorphFromMesh(LLPolyMesh *morph)
 
 	return TRUE;
 }
-
+//-----------------------------------------------------------------------------
+// saveOBJ()
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // LLPolyMorphTargetInfo()
 //-----------------------------------------------------------------------------
