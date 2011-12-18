@@ -181,7 +181,7 @@ public:
 	BOOL saveLLM(LLFILE *fp);
 
 	// Saves the mesh information as an OBJ file.
-	BOOL saveOBJ(LLFILE *fp);
+	S32 saveOBJ(LLFILE *fp, int index = 0);
 
 	// Loads new mesh information from an OBJ file.
 	BOOL loadOBJ(LLFILE *fp);
@@ -197,9 +197,6 @@ public:
 
 	// Saves the mesh information as a binary Linden Lab Mesh file.
 	//BOOL saveLLM(LLFILE *fp);
-
-	// Saves the mesh information as an OBJ file.
-	S32 saveOBJ(LLFILE *fp, int index = 0);
 
 	// Frees all loaded meshes.
 	// This should only be called once you know there are no outstanding

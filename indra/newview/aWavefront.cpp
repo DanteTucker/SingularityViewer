@@ -29,21 +29,23 @@ Wavefront::Wavefront(LLVolumeFace *fayse, LLXform *transform, bool include_norma
 	name = "";
 	vertices = vert_t();
 	triangles = tri_t();
-	for (U32 i = 0; i < fayse->mVertices.size(); i++)
+	v4adapt verts = v4adapt(fayse->mPositions);
+	v4adapt norms = v4adapt(fayse->mNormals);
+	for (S32 i = 0; i < fayse->mNumVertices; i++)
 	{
-		LLVector3 v = fayse->mVertices[i].mPosition;
-		vertices.push_back(std::pair<LLVector3, LLVector2>(v, fayse->mVertices[i].mTexCoord));
+		LLVector3 v = verts[i];
+		vertices.push_back(std::pair<LLVector3, LLVector2>(v, fayse->mTexCoords[i]));
 	}
 	if(transform)
 		Transform(vertices, transform);
 	if(include_normals)
 	{
-		for (U32 i = 0; i < fayse->mVertices.size(); i++)
-			normals.push_back(fayse->mVertices[i].mNormal);
+		for (S32 i = 0; i < fayse->mNumVertices; i++)
+			normals.push_back(norms[i]);
 		if(transform_normals)
 			Transform(normals, transform_normals);
 	}
-	for (U32 i = 0; i < fayse->mIndices.size()/3; i++) 
+	for (S32 i = 0; i < fayse->mNumIndices/3; i++) 
 	{
 		tri t;
 		t.v0 = fayse->mIndices[i*3+0];
@@ -323,4 +325,12 @@ BOOL WavefrontSaver::saveFile(LLFILE *fp, int index)
 	}
 	
 	return TRUE;
+}
+LLVector3& v4adapt::operator[] (const unsigned int i)
+{
+	F32* stor = new F32[4];
+	LLStrider<LLVector4a> strider = LLStrider<LLVector4a>();
+	strider = v4a;
+	strider[i].store4a(stor);
+	return *(new LLVector3(stor));
 }

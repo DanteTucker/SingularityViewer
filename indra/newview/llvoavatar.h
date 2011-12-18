@@ -666,6 +666,7 @@ private:
 
 	typedef std::multimap<std::string, LLPolyMesh*> polymesh_map_t;
 	polymesh_map_t 									mMeshes;
+public:
 	std::vector<LLViewerJoint *> 					mMeshLOD;
 
 	//--------------------------------------------------------------------

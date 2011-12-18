@@ -59,3 +59,11 @@ public:
 	void Add(LLVOAvatar *av_vo);
 	BOOL saveFile(LLFILE *fp, int index = 0);
 };
+class v4adapt
+{
+private:
+	LLVector4a* v4a;
+public:
+	v4adapt(LLVector4a* vp) { v4a = vp; }
+	LLVector3& operator[] (const unsigned int i);
+};
