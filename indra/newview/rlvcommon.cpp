@@ -302,11 +302,17 @@ const char* RlvStrings::getStringFromReturnCode(ERlvCmdRet eRet)
 // Checked: 2010-03-27 (RLVa-1.2.0b) | Modified: RLVa-1.2.0b
 std::string RlvStrings::getVersion(bool fLegacy /*=false*/) 
 {
+	static const LLCachedControl<std::string> client_name(gSavedSettings, "SpecifiedChannel");
+	static const LLCachedControl<U32> version_major(gSavedSettings, "SpecifiedVersionMaj");
+	static const LLCachedControl<U32> version_minor(gSavedSettings, "SpecifiedVersionMin");
+	static const LLCachedControl<U32> version_patch(gSavedSettings, "SpecifiedVersionPatch");
+	static const LLCachedControl<U32> version_build(gSavedSettings, "SpecifiedVersionBuild");
 	return llformat("%s viewer v%d.%d.%d (%s %d.%d.%d.%d - RLVa %d.%d.%d)",
 		( (!fLegacy) ? "RestrainedLove" : "RestrainedLife" ),
-		RLV_VERSION_MAJOR, RLV_VERSION_MINOR, RLV_VERSION_PATCH,
-		LLAppViewer::instance()->getSecondLifeTitle().c_str(), LL_VERSION_MAJOR, LL_VERSION_MINOR, LL_VERSION_PATCH, LL_VERSION_BUILD,
+		RLV_VERSION_MAJOR, RLV_VERSION_MINOR, RLV_VERSION_PATCH, client_name.get().c_str(), version_major.get(), version_minor.get(), version_patch.get(), version_build.get(),
+		/*LLAppViewer::instance()->getSecondLifeTitle().c_str(), LL_VERSION_MAJOR, LL_VERSION_MINOR, LL_VERSION_PATCH, LL_VERSION_BUILD,*/
 		RLVa_VERSION_MAJOR, RLVa_VERSION_MINOR, RLVa_VERSION_PATCH);
+	//PinkiePie: I'm a dirty furry now, so I wanted to make sure my information wasn't being spewed everywhere.
 }
 
 // Checked: 2010-04-18 (RLVa-1.2.0e) | Added: RLVa-1.2.0e

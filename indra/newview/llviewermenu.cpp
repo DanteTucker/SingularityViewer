@@ -242,7 +242,7 @@
 #include "llwlparammanager.h"
 #include "llwaterparammanager.h"
 #include "llfloaternotificationsconsole.h"
-#include "aWavefront.h"
+#include "awavefront.h"
 
 #include "llpolymesh.h"
 #include "lltexlayer.h"

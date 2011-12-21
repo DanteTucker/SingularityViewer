@@ -1,5 +1,5 @@
 /**
- * @file aWavefront.h
+ * @file awavefront.h
  * @brief A system which allows saving in-world objects to Wavefront .OBJ files for offline texturizing/shading.
  * @author Apelsin
  * 
@@ -62,8 +62,11 @@ public:
 class v4adapt
 {
 private:
-	LLVector4a* v4a;
+	LLStrider<LLVector4a> mV4aStrider;
 public:
-	v4adapt(LLVector4a* vp) { v4a = vp; }
-	LLVector3& operator[] (const unsigned int i);
+	v4adapt(LLVector4a* vp);
+	inline LLVector3 v4adapt::operator[] (const unsigned int i)
+	{
+		return LLVector3((F32*)&mV4aStrider[i]);
+	}
 };

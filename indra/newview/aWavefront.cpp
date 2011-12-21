@@ -1,5 +1,5 @@
 /**
- * @file aWavefront.cpp
+ * @file awavefront.cpp
  * @brief A system which allows saving in-world objects to Wavefront .OBJ files for offline texturizing/shading.
  * @author Apelsin
  * 
@@ -7,7 +7,7 @@
  *  
  */
 #include "llviewerprecompiledheaders.h"
-#include "aWavefront.h"
+#include "awavefront.h"
 #include "llviewercontrol.h"
 #include "llvoavatardefines.h"
 #include "llvolume.h"
@@ -25,10 +25,8 @@ Wavefront::Wavefront(vert_t v, tri_t t)
 	triangles = t;
 }
 Wavefront::Wavefront(LLVolumeFace *fayse, LLXform *transform, bool include_normals, LLXform *transform_normals)
+	:name("")
 {
-	name = "";
-	vertices = vert_t();
-	triangles = tri_t();
 	v4adapt verts = v4adapt(fayse->mPositions);
 	v4adapt norms = v4adapt(fayse->mNormals);
 	for (S32 i = 0; i < fayse->mNumVertices; i++)
@@ -76,10 +74,8 @@ Wavefront::Wavefront(LLVolumeFace *fayse, LLXform *transform, bool include_norma
 	}
 }*/
 Wavefront::Wavefront(LLFace *fayse, LLPolyMesh *mesh, LLXform *transform, bool include_normals, LLXform *transform_normals)
+	:name("")
 {
-	name = "";
-	vertices = vert_t();
-	triangles = tri_t();
 	LLStrider<LLVector3> getVerts = LLStrider<LLVector3>();
 	LLStrider<LLVector3> getNorms= LLStrider<LLVector3>();
 	LLStrider<LLVector2> getCoord = LLStrider<LLVector2>();
@@ -148,10 +144,8 @@ std::string WavefrontSaver::eyeRname = "eyeBallRightMesh";
 bool WavefrontSaver::swapYZ = false;
 
 WavefrontSaver::WavefrontSaver()
+	:scale(1.0)
 {
-	offset = LLVector3();
-	scale = 1.0;
-	obj_v = wave_t();
 	//By the time this constructor is called, it should be safe to do this...
 	eyeLname = LLVOAvatarDefines::LLVOAvatarDictionary::getInstance()->
 		getMesh(LLVOAvatarDefines::MESH_ID_EYEBALL_LEFT)->mName;
@@ -326,11 +320,7 @@ BOOL WavefrontSaver::saveFile(LLFILE *fp, int index)
 	
 	return TRUE;
 }
-LLVector3& v4adapt::operator[] (const unsigned int i)
+v4adapt::v4adapt(LLVector4a* vp)
 {
-	F32* stor = new F32[4];
-	LLStrider<LLVector4a> strider = LLStrider<LLVector4a>();
-	strider = v4a;
-	strider[i].store4a(stor);
-	return *(new LLVector3(stor));
+	mV4aStrider = vp;
 }

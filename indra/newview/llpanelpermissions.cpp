@@ -981,15 +981,32 @@ void LLPanelPermissions::onClickCopyObjKey(void* data)
 	//At some point the separator was changed to read from the xml settings - I'll probably try to make this openly changable from settings. -HgB
 	std::string output;
 	std::string separator = gSavedSettings.getString("AscentDataSeparator");
-	for (LLObjectSelection::root_iterator iter = LLSelectMgr::getInstance()->getSelection()->root_begin();
-		iter != LLSelectMgr::getInstance()->getSelection()->root_end(); iter++)
+	if(gSavedSettings.getBOOL("EditLinkedParts"))
 	{
-		LLSelectNode* selectNode = *iter;
-		LLViewerObject* object = selectNode->getObject();
-		if (object)
+		for (LLObjectSelection::iterator iter = LLSelectMgr::getInstance()->getSelection()->begin();
+			iter != LLSelectMgr::getInstance()->getSelection()->end(); iter++)
 		{
-			if (!output.empty()) output.append(separator);
-			output.append(object->getID().asString());
+			LLSelectNode* selectNode = *iter;
+			LLViewerObject* object = selectNode->getObject();
+			if (object)
+			{
+				if (!output.empty()) output.append(separator);
+				output.append(object->getID().asString());
+			}
+		}
+	}
+	else
+	{
+		for (LLObjectSelection::root_iterator iter = LLSelectMgr::getInstance()->getSelection()->root_begin();
+			iter != LLSelectMgr::getInstance()->getSelection()->root_end(); iter++)
+		{
+			LLSelectNode* selectNode = *iter;
+			LLViewerObject* object = selectNode->getObject();
+			if (object)
+			{
+				if (!output.empty()) output.append(separator);
+				output.append(object->getID().asString());
+			}
 		}
 	}
 	if (!output.empty()) gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(output));
