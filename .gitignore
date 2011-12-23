@@ -26,3 +26,5 @@ Makefile
 progress.marks
 /indra/CMakeFiles
 /indra/newview/chat.txt
+/indra/newview/app_settings/message.xml
+/indra/newview/app_settings/message_template.msg
