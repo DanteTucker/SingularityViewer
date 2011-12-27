@@ -483,6 +483,11 @@ LLImportObject::LLImportObject(std::string id, LLSD prim)
 		LLSculptParams *wat = new LLSculptParams();
 		wat->fromLLSD(prim["sculpt"]);
 		LLSculptParams sculpt = *wat;
+		if(sculpt.getSculptType() == 5)//5 is apparently mesh... yeah.
+		{
+			llinfos << "Oh no mesh, fuck you." << llendl;
+			sculpt.setSculptType(0);//fuck you
+		}
 		setParameterEntry(LLNetworkData::PARAMS_SCULPT, sculpt, true);
 		setParameterEntryInUse(LLNetworkData::PARAMS_SCULPT, TRUE, true);
 	}
