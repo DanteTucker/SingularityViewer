@@ -2270,7 +2270,7 @@ bool LLAppViewer::initConfiguration()
 	// Set the name of the window
 	//
 #if LL_RELEASE_FOR_DOWNLOAD
-	gWindowTitle = gSecondLife + "-v6.1.1";//PinkiePie: PH_VERSION
+	gWindowTitle = gSecondLife + llformat("-v%d.%d.%d", LL_VERSION_MAJOR, LL_VERSION_MINOR, LL_VERSION_PATCH);//PinkiePie: PH_VERSION
 #elif LL_DEBUG
 	gWindowTitle = gSecondLife + std::string(" [DEBUG] ") + gArgs;
 #else
