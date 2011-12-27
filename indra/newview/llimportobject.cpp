@@ -1135,7 +1135,7 @@ void LLXmlImport::onNewAttachment(LLViewerObject* object)
 		// position and rotation
 		object->setRotation(sPt2attachrot[attachpt], FALSE);
 		object->setPosition(sPt2attachpos[attachpt], FALSE);
-		multiple_object_update(object, UPD_POSITION | UPD_ROTATION);
+		multiple_object_update(object, UPD_LINKED_SETS | UPD_POSITION | UPD_ROTATION);
 		
 		// Done?
 		sAttachmentsDone++;
