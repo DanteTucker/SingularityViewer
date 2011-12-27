@@ -1093,6 +1093,18 @@ void LLFloaterAO::onNotecardLoadComplete(LLVFS *vfs,const LLUUID& asset_uuid,LLA
 							std::string strtoken(what[0]);
 							std::string stranim(*anim);
 							LLUUID animid(getAssetIDByName(stranim));
+							if(stranim.length() == 36)
+							{
+								/*
+								//PinkiePie: I don't remember how this function works, if anyone wants to make this work... go for it.
+								// It works like this, so what ever.
+								boost::regex type("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+								boost::smatch what;
+								if(boost::regex_search(stranim, what, type))
+								*/
+								LLUUID PurpleDicks = LLUUID(stranim);
+								if(!(PurpleDicks.isNull()))animid = PurpleDicks;
+							}
 
 //							llinfos << invfolderid.asString().c_str() << llendl;
 //							llinfos << "anim: " << stranim.c_str() << " assetid: " << animid << llendl;
