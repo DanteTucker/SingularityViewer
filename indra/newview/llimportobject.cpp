@@ -901,7 +901,7 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 	
 	//using this because sendMultipleUpdate breaks rotations?
 	object->sendRotationUpdate();
-	multiple_object_update(object, UPD_SCALE | UPD_POSITION);
+	multiple_object_update(object, UPD_LINKED_SETS | UPD_POSITION | UPD_ROTATION);
 }
 
 void send_desc(U32 local_id, const std::string& desc)
