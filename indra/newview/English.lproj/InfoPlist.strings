@@ -2,5 +2,5 @@
 
 CFBundleName = "PartyHat";
 
-CFBundleShortVersionString = "PartyHat Viewer 1.6.0.3";
-CFBundleGetInfoString = "PartyHat Viewer 1.6.0.3, Copyright 2011 PinkiePie Research Inc.";
+CFBundleShortVersionString = "PartyHat Viewer 6.1.1";
+CFBundleGetInfoString = "PartyHat Viewer 6.1.1, Copyright 2011 PinkiePie Research Inc.";
