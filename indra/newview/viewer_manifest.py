@@ -394,7 +394,7 @@ class WindowsManifest(ViewerManifest):
         !define VERSION_LONG "%(version)s"
         !define VERSION_DASHES "%(version_dashes)s"
         """ % substitution_strings
-        installer_file = "PartyHat_%(version_short)s_Setup.exe"
+        installer_file = "PartyHat_%(version)s_Setup.exe"
         grid_vars_template = """
         OutFile "%(installer_file)s"
         !define VIEWERNAME "PartyHat Viewer"
@@ -403,8 +403,8 @@ class WindowsManifest(ViewerManifest):
         !define SHORTCUT   "PartyHat Viewer"
         !define URLNAME   "secondlife"
         !define INSTALL_ICON "install_icon_partyhat.ico"
-        !define UNINSTALL_ICON "install_icon_partyhat.ico"
-        Caption "PartyHat Viewer ${VERSION}"
+        !define UNINSTALL_ICON "uninstall_icon_partyhat.ico"
+        Caption "PartyHat Viewer ${VERSION_LONG}"
         """
         if 'installer_name' in self.args:
             installer_file = self.args['installer_name']

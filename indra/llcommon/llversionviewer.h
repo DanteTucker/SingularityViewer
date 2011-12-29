@@ -33,15 +33,15 @@
 #ifndef LL_LLVERSIONVIEWER_H
 #define LL_LLVERSIONVIEWER_H
 
-const S32 LL_VERSION_MAJOR = 1;
-const S32 LL_VERSION_MINOR = 6;
-const S32 LL_VERSION_PATCH = 0;
-const S32 LL_VERSION_BUILD = 3;
+const S32 LL_VERSION_MAJOR = 6;
+const S32 LL_VERSION_MINOR = 1;
+const S32 LL_VERSION_PATCH = 4;
+const S32 LL_VERSION_BUILD = 0;
 
-const char * const LL_CHANNEL = "Singularity";
+const char * const LL_CHANNEL = "Party Hat Developer";
 
 #if LL_DARWIN
-const char * const LL_VERSION_BUNDLE_ID = "com.secondlife.singularity.viewer";
+const char * const LL_VERSION_BUNDLE_ID = "com.secondlife.partyhat.viewer";
 #endif
 
 #endif

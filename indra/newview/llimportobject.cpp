@@ -483,6 +483,11 @@ LLImportObject::LLImportObject(std::string id, LLSD prim)
 		LLSculptParams *wat = new LLSculptParams();
 		wat->fromLLSD(prim["sculpt"]);
 		LLSculptParams sculpt = *wat;
+		if(sculpt.getSculptType() == 5)//5 is apparently mesh... yeah.
+		{
+			llinfos << "Oh no mesh, fuck you." << llendl;
+			sculpt.setSculptType(0);//fuck you
+		}
 		setParameterEntry(LLNetworkData::PARAMS_SCULPT, sculpt, true);
 		setParameterEntryInUse(LLNetworkData::PARAMS_SCULPT, TRUE, true);
 	}
@@ -901,7 +906,7 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 	
 	//using this because sendMultipleUpdate breaks rotations?
 	object->sendRotationUpdate();
-	multiple_object_update(object, UPD_SCALE | UPD_POSITION);
+	multiple_object_update(object, UPD_LINKED_SETS | UPD_SCALE | UPD_POSITION);
 }
 
 void send_desc(U32 local_id, const std::string& desc)
@@ -1135,7 +1140,7 @@ void LLXmlImport::onNewAttachment(LLViewerObject* object)
 		// position and rotation
 		object->setRotation(sPt2attachrot[attachpt], FALSE);
 		object->setPosition(sPt2attachpos[attachpt], FALSE);
-		multiple_object_update(object, UPD_POSITION | UPD_ROTATION);
+		multiple_object_update(object, UPD_LINKED_SETS | UPD_POSITION | UPD_ROTATION);
 		
 		// Done?
 		sAttachmentsDone++;

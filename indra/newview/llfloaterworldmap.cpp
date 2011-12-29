@@ -547,10 +547,13 @@ void LLFloaterWorldMap::trackAvatar( const LLUUID& avatar_id, const std::string&
 		// *HACK: Adjust Z values automatically for liaisons & gods so
 		// they swoop down when they click on the map. Requested
 		// convenience.
+		/*
+		//PinkiePie: fuck the lindens who wanted this
 		if(gAgent.isGodlike())
 		{
 			childSetValue("spin z", LLSD(200.f));
 		}
+		*/
 		// Don't re-request info if we already have it or we won't have it in time to teleport
 		if (mTrackedStatus != LLTracker::TRACKING_AVATAR || name != mTrackedAvatarName)
 		{
@@ -736,6 +739,8 @@ void LLFloaterWorldMap::updateLocation()
 		mTrackedLocation = pos_global;
 		mTrackedSimName = sim_name;
 		
+		/*
+		//PinkiePie: fuck the lindens who wanted this
 		if (status == LLTracker::TRACKING_AVATAR)
 		{
 			// *HACK: Adjust Z values automatically for liaisons &
@@ -746,6 +751,7 @@ void LLFloaterWorldMap::updateLocation()
 				pos_global[2] = 200;
 			}
 		}
+		*/
 
 		childSetValue("location", sim_name);
 		

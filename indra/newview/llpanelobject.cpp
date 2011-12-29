@@ -502,8 +502,9 @@ void LLPanelObject::getState( )
 // [/RLVa:KB]
 
 	LLVector3 vec;
-	if (enable_move)
-	{
+	// <edit>
+	//if (enable_move)
+	//{
 		vec = objectp->getPositionEdit();
 		mCtrlPosX->set( vec.mV[VX] );
 		mCtrlPosY->set( vec.mV[VY] );
@@ -511,8 +512,8 @@ void LLPanelObject::getState( )
 		calcp->setVar(LLCalc::X_POS, vec.mV[VX]);
 		calcp->setVar(LLCalc::Y_POS, vec.mV[VY]);
 		calcp->setVar(LLCalc::Z_POS, vec.mV[VZ]);
-	}
-	else
+	//}
+	/*else
 	{
 		mCtrlPosX->clear();
 		mCtrlPosY->clear();
@@ -520,7 +521,8 @@ void LLPanelObject::getState( )
 		calcp->clearVar(LLCalc::X_POS);
 		calcp->clearVar(LLCalc::Y_POS);
 		calcp->clearVar(LLCalc::Z_POS);
-	}
+	}*/
+	// </edit>
 
 
 	mLabelPosition->setEnabled( enable_move );
@@ -533,8 +535,9 @@ void LLPanelObject::getState( )
 	mBtnPastePos->setEnabled(enable_move);
 	mBtnPastePosClip->setEnabled(enable_move);
 
-	if (enable_scale)
-	{
+	// <edit>
+	//if (enable_scale)
+	//{
 		vec = objectp->getScale();
 		mCtrlScaleX->set( vec.mV[VX] );
 		mCtrlScaleY->set( vec.mV[VY] );
@@ -542,8 +545,8 @@ void LLPanelObject::getState( )
 		calcp->setVar(LLCalc::X_SCALE, vec.mV[VX]);
 		calcp->setVar(LLCalc::Y_SCALE, vec.mV[VY]);
 		calcp->setVar(LLCalc::Z_SCALE, vec.mV[VZ]);
-	}
-	else
+	//}
+	/*else
 	{
 		mCtrlScaleX->clear();
 		mCtrlScaleY->clear();
@@ -551,7 +554,8 @@ void LLPanelObject::getState( )
 		calcp->setVar(LLCalc::X_SCALE, 0.f);
 		calcp->setVar(LLCalc::Y_SCALE, 0.f);
 		calcp->setVar(LLCalc::Z_SCALE, 0.f);
-	}
+	}*/
+	// </edit>
 
 	mLabelSize->setEnabled( enable_scale );
 	mCtrlScaleX->setEnabled( enable_scale );
@@ -571,16 +575,17 @@ void LLPanelObject::getState( )
 	mCurEulerDegrees.mV[VY] = fmod(llround(mCurEulerDegrees.mV[VY], OBJECT_ROTATION_PRECISION) + 360.f, 360.f);
 	mCurEulerDegrees.mV[VZ] = fmod(llround(mCurEulerDegrees.mV[VZ], OBJECT_ROTATION_PRECISION) + 360.f, 360.f);
 
-	if (enable_rotate)
-	{
+	// <edit>
+	//if (enable_rotate)
+	//{
 		mCtrlRotX->set( mCurEulerDegrees.mV[VX] );
 		mCtrlRotY->set( mCurEulerDegrees.mV[VY] );
 		mCtrlRotZ->set( mCurEulerDegrees.mV[VZ] );
 		calcp->setVar(LLCalc::X_ROT, mCurEulerDegrees.mV[VX]);
 		calcp->setVar(LLCalc::Y_ROT, mCurEulerDegrees.mV[VY]);
 		calcp->setVar(LLCalc::Z_ROT, mCurEulerDegrees.mV[VZ]);
-	}
-	else
+	//}
+	/*else
 	{
 		mCtrlRotX->clear();
 		mCtrlRotY->clear();
@@ -588,7 +593,7 @@ void LLPanelObject::getState( )
 		calcp->clearVar(LLCalc::X_ROT);
 		calcp->clearVar(LLCalc::Y_ROT);
 		calcp->clearVar(LLCalc::Z_ROT);
-	}
+	}*/
 
 	mLabelRotation->setEnabled( enable_rotate );
 	mCtrlRotX->setEnabled( enable_rotate );

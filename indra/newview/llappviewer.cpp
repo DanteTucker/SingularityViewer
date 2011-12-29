@@ -2270,12 +2270,33 @@ bool LLAppViewer::initConfiguration()
 	// Set the name of the window
 	//
 #if LL_RELEASE_FOR_DOWNLOAD
-	gWindowTitle = gSecondLife + "-v6.1";//PinkiePie: PH_VERSION
+	gWindowTitle = gSecondLife + llformat("-v%d.%d.%d", LL_VERSION_MAJOR, LL_VERSION_MINOR, LL_VERSION_PATCH);//PinkiePie: PH_VERSION
 #elif LL_DEBUG
 	gWindowTitle = gSecondLife + std::string(" [DEBUG] ") + gArgs;
 #else
 	gWindowTitle = gSecondLife + std::string(" ") + gArgs;
 #endif
+
+	//random splashtext
+	std::string splashtext_filename = gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "splashtext.txt");
+	std::ifstream splashtext_file(splashtext_filename);
+	std::vector<std::string> splashtext_vec;
+
+	if(splashtext_file.is_open())
+	{
+		std::string line;
+		while(splashtext_file.good())
+		{
+			std::getline(splashtext_file, line);
+			splashtext_vec.push_back(line);
+		}
+
+		if(splashtext_vec.size() > 0)
+		{
+			gWindowTitle.append(" - " + splashtext_vec.at((U32)ll_rand(splashtext_vec.size())));
+		}
+	}
+
 	LLStringUtil::truncate(gWindowTitle, 255);
 
 	//RN: if we received a URL, hand it off to the existing instance.
