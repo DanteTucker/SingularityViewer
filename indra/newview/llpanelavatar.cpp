@@ -1663,8 +1663,7 @@ void LLPanelAvatar::setAvatarID(const LLUUID &avatar_id, const std::string &name
 		}
 	}
 	
-	BOOL is_god = FALSE;
-	if (gAgent.isGodlike()) is_god = TRUE;
+	BOOL is_god = gAgent.isGodlike();
 	
 	childSetVisible("Kick", is_god);
 	childSetEnabled("Kick", is_god);
