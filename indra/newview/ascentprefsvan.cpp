@@ -278,11 +278,6 @@ void LLPrefsAscentVan::refreshValues()
 // Update controls based on current settings
 void LLPrefsAscentVan::refresh()
 {
-    //General --------------------------------------------------------------------------------
-	LLComboBox* combo_fonts = getChild<LLComboBox>("fonts_selector");
-	std::string fontxml = gSavedSettings.getString("FontSettingsFile");
-	combo_fonts->selectByValue(fontxml);
-
     //Tags\Colors ----------------------------------------------------------------------------
     //Colors ---------------------------------------------------------------------------------
 	LLComboBox* combo = getChild<LLComboBox>("tag_spoofing_combobox");
