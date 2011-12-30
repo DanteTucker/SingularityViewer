@@ -67,6 +67,7 @@
 #include "llhudmanager.h"
 #include "llinventorymodel.h"
 #include "llmenugl.h"
+#include "llmeshrepository.h"
 #include "llmutelist.h"
 #include "llnotificationsutil.h"
 #include "llstatusbar.h"
@@ -89,6 +90,7 @@
 #include "llvoavatar.h"
 #include "llvovolume.h"
 #include "pipeline.h"
+#include "llviewershadermgr.h"
 
 #include "llglheaders.h"
 #include "hippogridmanager.h"
@@ -1995,7 +1997,6 @@ BOOL LLSelectMgr::selectionGetGlow(F32 *glow)
 	return identical;
 }
 
-#if MESH_ENABLED
 void LLSelectMgr::selectionSetPhysicsType(U8 type)
 {
 	struct f : public LLSelectedObjectFunctor
@@ -2090,7 +2091,6 @@ void LLSelectMgr::selectionSetRestitution(F32 restitution)
 	} sendfunc(restitution);
 	getSelection()->applyToObjects(&sendfunc);
 }
-#endif //MESH_ENABLED
 
 //-----------------------------------------------------------------------------
 // selectionSetMaterial()
@@ -3932,7 +3932,6 @@ void LLSelectMgr::sendDelink()
 		return;
 	}
 
-#if MESH_ENABLED
 	struct f : public LLSelectedObjectFunctor
 	{ //on delink, any modifyable object should
 		f() {}
@@ -3951,7 +3950,6 @@ void LLSelectMgr::sendDelink()
 		}
 	} sendfunc;
 	getSelection()->applyToObjects(&sendfunc);
-#endif //MESH_ENABLED
 
 	// Delink needs to send individuals so you can unlink a single object from
 	// a linked set.
@@ -4736,7 +4734,6 @@ void LLSelectMgr::processObjectProperties(LLMessageSystem* msg, void** user_data
 			node->mInventorySerial = inv_serial;
 			node->mSitName.assign(sit_name);
 			node->mTouchName.assign(touch_name);
-
 		}
 
 		// <edit>
@@ -4879,7 +4876,6 @@ void LLSelectMgr::processForceObjectSelect(LLMessageSystem* msg, void**)
 	// Don't select, just highlight
 	LLSelectMgr::getInstance()->highlightObjectAndFamily(objects);
 }
-
 
 void LLSelectMgr::updateSilhouettes()
 {
@@ -5170,8 +5166,7 @@ void LLSelectMgr::renderSilhouettes(BOOL for_hud)
 
 	if (isAgentAvatarValid() && for_hud)
 	{
-			LLVOAvatar* avatar = gAgentAvatarp;
-		LLBBox hud_bbox = avatar->getHUDBBox();
+		LLBBox hud_bbox = gAgentAvatarp->getHUDBBox();
 
 		F32 cur_zoom = gAgentCamera.mHUDCurZoom;
 
@@ -5583,7 +5578,8 @@ BOOL LLSelectNode::allowOperationOnNode(PermissionBit op, U64 group_proxy_power)
 	return (mPermissions->allowOperationBy(op, proxy_agent_id, group_id));
 }
 
-#if MESH_ENABLED
+
+//helper function for pushing relevant vertices from drawable to GL
 void pushWireframe(LLDrawable* drawable)
 {
 	if (drawable->isState(LLDrawable::RIGGED))
@@ -5601,8 +5597,7 @@ void pushWireframe(LLDrawable* drawable)
 				for (S32 i = 0; i < rigged_volume->getNumVolumeFaces(); ++i)
 				{
 					const LLVolumeFace& face = rigged_volume->getVolumeFace(i);
-					glVertexPointer(3, GL_FLOAT, 16, face.mPositions);
-					glDrawElements(GL_TRIANGLES, face.mNumIndices, GL_UNSIGNED_SHORT, face.mIndices);
+					LLVertexBuffer::drawElements(LLRender::TRIANGLES, face.mPositions, face.mTexCoords, face.mNumIndices, face.mIndices);
 				}
 				gGL.popMatrix();
 			}
@@ -5615,7 +5610,7 @@ void pushWireframe(LLDrawable* drawable)
 			LLFace* face = drawable->getFace(i);
 			if (face->verify())
 			{
-				pushVerts(face, LLVertexBuffer::MAP_VERTEX);
+				pushVerts(face, LLVertexBuffer::MAP_VERTEX | LLVertexBuffer::MAP_TEXCOORD0);
 			}
 		}
 	}
@@ -5635,6 +5630,12 @@ void LLSelectNode::renderOneWireframe(const LLColor4& color)
 		return;
 	}
 
+	LLGLSLShader* shader = LLGLSLShader::sCurBoundShaderPtr;
+
+	if (shader)
+	{
+		gHighlightProgram.bind();
+	}
 
 	gGL.matrixMode(LLRender::MM_MODELVIEW);
 	gGL.pushMatrix();
@@ -5659,19 +5660,27 @@ void LLSelectNode::renderOneWireframe(const LLColor4& color)
 	if (LLSelectMgr::sRenderHiddenSelections) // && gFloaterTools && gFloaterTools->getVisible())
 	{
 		gGL.blendFunc(LLRender::BF_SOURCE_COLOR, LLRender::BF_ONE);
-		LLGLEnable fog(GL_FOG);
-		glFogi(GL_FOG_MODE, GL_LINEAR);
-		float d = (LLViewerCamera::getInstance()->getPointOfInterest()-LLViewerCamera::getInstance()->getOrigin()).magVec();
-		LLColor4 fogCol = color * (F32)llclamp((LLSelectMgr::getInstance()->getSelectionCenterGlobal()-gAgentCamera.getCameraPositionGlobal()).magVec()/(LLSelectMgr::getInstance()->getBBoxOfSelection().getExtentLocal().magVec()*4), 0.0, 1.0);
-		glFogf(GL_FOG_START, d);
-		glFogf(GL_FOG_END, d*(1 + (LLViewerCamera::getInstance()->getView() / LLViewerCamera::getInstance()->getDefaultFOV())));
-		glFogfv(GL_FOG_COLOR, fogCol.mV);
-
 		LLGLDepthTest gls_depth(GL_TRUE, GL_FALSE, GL_GEQUAL);
-		gGL.setAlphaRejectSettings(LLRender::CF_DEFAULT);
+		if (shader)
 		{
 			gGL.diffuseColor4f(color.mV[VRED], color.mV[VGREEN], color.mV[VBLUE], 0.4f);
 			pushWireframe(drawable);
+		}
+		else
+		{
+			LLGLEnable fog(GL_FOG);
+			glFogi(GL_FOG_MODE, GL_LINEAR);
+			float d = (LLViewerCamera::getInstance()->getPointOfInterest()-LLViewerCamera::getInstance()->getOrigin()).magVec();
+			LLColor4 fogCol = color * (F32)llclamp((LLSelectMgr::getInstance()->getSelectionCenterGlobal()-gAgentCamera.getCameraPositionGlobal()).magVec()/(LLSelectMgr::getInstance()->getBBoxOfSelection().getExtentLocal().magVec()*4), 0.0, 1.0);
+			glFogf(GL_FOG_START, d);
+			glFogf(GL_FOG_END, d*(1 + (LLViewerCamera::getInstance()->getView() / LLViewerCamera::getInstance()->getDefaultFOV())));
+			glFogfv(GL_FOG_COLOR, fogCol.mV);
+
+			gGL.setAlphaRejectSettings(LLRender::CF_DEFAULT);
+			{
+				gGL.diffuseColor4f(color.mV[VRED], color.mV[VGREEN], color.mV[VBLUE], 0.4f);
+				pushWireframe(drawable);
+			}
 		}
 	}
 
@@ -5687,8 +5696,12 @@ void LLSelectNode::renderOneWireframe(const LLColor4& color)
 	glLineWidth(1.f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	gGL.popMatrix();
+
+	if (shader)
+	{
+		shader->bind();
+	}
 }
-#endif //MESH_ENABLED
 
 //-----------------------------------------------------------------------------
 // renderOneSilhouette()
@@ -5707,14 +5720,12 @@ void LLSelectNode::renderOneSilhouette(const LLColor4 &color)
 		return;
 	}
 
-#if MESH_ENABLED
 	LLVOVolume* vobj = drawable->getVOVolume();
 	if (vobj && vobj->isMesh())
 	{
 		renderOneWireframe(color);
 		return;
 	}
-#endif //MESH_ENABLED
 
 	if (!mSilhouetteExists)
 	{
@@ -5726,6 +5737,14 @@ void LLSelectNode::renderOneSilhouette(const LLColor4 &color)
 	if (mSilhouetteVertices.size() == 0 || mSilhouetteNormals.size() != mSilhouetteVertices.size())
 	{
 		return;
+	}
+
+
+	LLGLSLShader* shader = LLGLSLShader::sCurBoundShaderPtr;
+
+	if (shader)
+	{ //switch to "solid color" program for SH-2690 -- works around driver bug causing bad triangles when rendering silhouettes
+		gSolidColorProgram.bind();
 	}
 
 	gGL.matrixMode(LLRender::MM_MODELVIEW);
@@ -5846,6 +5865,11 @@ void LLSelectNode::renderOneSilhouette(const LLColor4 &color)
 		gGL.flush();
 	}
 	gGL.popMatrix();
+
+	if (shader)
+	{
+		shader->bind();
+	}
 }
 
 //
@@ -6402,10 +6426,10 @@ S32 LLObjectSelection::getObjectCount()
 {
 	cleanupNodes();
 	S32 count = mList.size();
+
 	return count;
 }
 
-#if MESH_ENABLED
 F32 LLObjectSelection::getSelectedObjectCost()
 {
 	cleanupNodes();
@@ -6531,7 +6555,7 @@ F32 LLObjectSelection::getSelectedObjectStreamingCost(S32* total_bytes, S32* vis
 	return cost;
 }
 
-U32 LLObjectSelection::getSelectedObjectTriangleCount()
+U32 LLObjectSelection::getSelectedObjectTriangleCount(S32* vcount)
 {
 	U32 count = 0;
 	for (list_t::iterator iter = mList.begin(); iter != mList.end(); ++iter)
@@ -6541,13 +6565,12 @@ U32 LLObjectSelection::getSelectedObjectTriangleCount()
 		
 		if (object)
 		{
-			count += object->getTriangleCount();
+			count += object->getTriangleCount(vcount);
 		}
 	}
 
 	return count;
 }
-
 
 S32 LLObjectSelection::getSelectedObjectRenderCost()
 {
@@ -6618,9 +6641,6 @@ S32 LLObjectSelection::getSelectedObjectRenderCost()
 
        return cost;
 }
-
-#endif //MESH_ENABLED
-
 
 //-----------------------------------------------------------------------------
 // getTECount()
@@ -7215,16 +7235,4 @@ void LLSelectMgr::sendSelectionMove()
 	}
 
 	//saveSelectedObjectTransform(SELECT_ACTION_TYPE_PICK);
-}
-
-U32 LLSelectMgr::getRectSelectedObjectsCount()
-{
-	U32 accumulator = mRectSelectedObjects.size();
-	for( std::set<LLPointer<LLViewerObject> >::iterator itr = mRectSelectedObjects.begin();
-		itr != mRectSelectedObjects.end();
-		itr++)
-	{
-		accumulator+= (*itr)->getChildren().size();
-	}
-	return accumulator;
 }

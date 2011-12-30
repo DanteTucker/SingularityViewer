@@ -3330,7 +3330,7 @@ void LLPhysicsDecomp::doDecompositionSingleHull()
 		completeCurrent();
 		
 	}
-#endif //!MESH_IMPORT	
+#endif
 }
 
 

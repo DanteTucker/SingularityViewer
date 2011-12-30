@@ -54,16 +54,18 @@
 #include "llhoverview.h"
 #include "llworld.h"
 #include "llstring.h"
-#include "llhudtext.h"
+#include "llhudnametag.h"
 #include "lldrawable.h"
 #include "xform.h"
 #include "llsky.h"
 #include "llviewercamera.h"
 #include "llselectmgr.h"
 #include "llresmgr.h"
+#include "llsdutil.h"
 #include "llviewerregion.h"
 #include "llviewerstats.h"
 #include "llvovolume.h"
+#include "llvoavatarself.h"
 #include "lltoolmgr.h"
 #include "lltoolpie.h"
 #include "llkeyboard.h"
@@ -696,8 +698,6 @@ void LLViewerObjectList::updateApparentAngles(LLAgent &agent)
 	LLVOAvatar::cullAvatarsByPixelArea();
 }
 
-#if MESH_ENABLED
-
 class LLObjectCostResponder : public LLCurl::Responder
 {
 public:
@@ -881,7 +881,6 @@ public:
 private:
 	LLSD mObjectIDs;
 };
-#endif //MESH_ENABLED
 
 void LLViewerObjectList::update(LLAgent &agent, LLWorld &world)
 {
@@ -989,10 +988,9 @@ void LLViewerObjectList::update(LLAgent &agent, LLWorld &world)
 		}
 	}
 
-#if MESH_ENABLED
 	fetchObjectCosts();
 	fetchPhysicsFlags();
-#endif //MESH_ENABLED
+
 	mNumSizeCulled = 0;
 	mNumVisCulled = 0;
 
@@ -1061,7 +1059,6 @@ void LLViewerObjectList::update(LLAgent &agent, LLWorld &world)
 	LLViewerStats::getInstance()->mNumVisCulledStat.addValue(mNumVisCulled);
 }
 
-#if MESH_ENABLED
 void LLViewerObjectList::fetchObjectCosts()
 {
 	// issue http request for stale object physics costs
@@ -1177,7 +1174,6 @@ void LLViewerObjectList::fetchPhysicsFlags()
 		}
 	}
 }
-#endif //MESH_ENABLED
 
 void LLViewerObjectList::clearDebugText()
 {
@@ -1439,7 +1435,6 @@ void LLViewerObjectList::updateActive(LLViewerObject *objectp)
 	}
 }
 
-#if MESH_ENABLED
 void LLViewerObjectList::updateObjectCost(LLViewerObject* object)
 {
 	if (!object->isRoot())
@@ -1507,8 +1502,6 @@ void LLViewerObjectList::onPhysicsFlagsFetchFailure(const LLUUID& object_id)
 	//llwarns << "Failed to fetch physics flags for object: " << object_id << llendl;
 	mPendingPhysicsFlags.erase(object_id);
 }
-#endif //MESH_ENABLED
-
 
 void LLViewerObjectList::shiftObjects(const LLVector3 &offset)
 {
@@ -1642,7 +1635,6 @@ void LLViewerObjectList::renderObjectsForMap(LLNetMap &netmap)
 		{
 			continue;
 		}
-		
 		const LLVector3& scale = objectp->getScale();
 		const LLVector3d pos = objectp->getPositionGlobal();
 		const F64 water_height = F64( objectp->getRegion()->getWaterHeight() );
@@ -1755,7 +1747,7 @@ void LLViewerObjectList::generatePickList(LLCamera &camera)
 			}
 		}
 
-		LLHUDText::addPickable(mSelectPickList);
+		LLHUDNameTag::addPickable(mSelectPickList);
 
 		for (std::vector<LLCharacter*>::iterator iter = LLCharacter::sInstances.begin();
 			iter != LLCharacter::sInstances.end(); ++iter)
