@@ -25,6 +25,7 @@
 #include "llfloaterperms.h" //get default perms
 #include "lllocalinventory.h"
 #include "llnotificationsutil.h"
+#include "llwearablelist.h"
 
 std::list<HGFloaterTextEditor*> HGFloaterTextEditor::sInstances;
 S32 HGFloaterTextEditor::sUploadAmount = 10;
@@ -232,6 +233,8 @@ void HGFloaterTextEditor::assetCallback(LLVFS *vfs,
 	}
 }
 
+extern void wearable_callback(LLWearable* old_wearable, void*);
+
 // static
 void HGFloaterTextEditor::onClickUpload(void* user_data)
 {
@@ -263,7 +266,11 @@ void HGFloaterTextEditor::onClickUpload(void* user_data)
 	LLAssetStorage::LLStoreAssetCallback callback = NULL;
 	void *fake_user_data = NULL;
 
-	if(item->getType() != LLAssetType::AT_GESTURE && item->getType() != LLAssetType::AT_LSL_TEXT
+	if(item->getType() == LLAssetType::AT_BODYPART || item->getType() == LLAssetType::AT_CLOTHING)
+	{
+		LLWearableList::getInstance()->getAsset(item->getAssetUUID(), item->getName(), item->getType(), wearable_callback, (void*)item->getName().c_str());
+	}
+	else if(item->getType() != LLAssetType::AT_GESTURE && item->getType() != LLAssetType::AT_LSL_TEXT
 		&& item->getType() != LLAssetType::AT_NOTECARD)
 	{
 		upload_new_resource(transaction_id, 

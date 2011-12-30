@@ -1671,10 +1671,10 @@ void LLInventoryPanel::modelChanged(U32 mask)
 					if (!view_item)
 					{
 						// this object was just created, need to build a view for it
-						if ((mask & LLInventoryObserver::ADD) != LLInventoryObserver::ADD)
+						/*if ((mask & LLInventoryObserver::ADD) != LLInventoryObserver::ADD)
 						{
-							llwarns << *id_it << " is in model but not in view, but ADD flag not set" << llendl;
-						}
+							LL_WARNS_ONCE("LLInventoryPanel::modelChanged") << *id_it << " is in model but not in view, but ADD flag not set" << LL_ENDL;
+						}*/
 						buildNewViews(*id_it);
 						
 						// select any newly created object
@@ -1687,11 +1687,11 @@ void LLInventoryPanel::modelChanged(U32 mask)
 					}
 					else
 					{
-						// this object was probably moved, check its parent
+						/*// this object was probably moved, check its parent
 						if ((mask & LLInventoryObserver::STRUCTURE) != LLInventoryObserver::STRUCTURE)
 						{
-							llwarns << *id_it << " is in model and in view, but STRUCTURE flag not set" << llendl;
-						}
+							LL_WARNS_ONCE("LLInventoryPanel::modelChanged") << *id_it << " is in model and in view, but STRUCTURE flag not set" << LL_ENDL;
+						}*/
 
 						LLFolderViewFolder* new_parent = (LLFolderViewFolder*)mFolders->getItemByID(model_item->getParentUUID());
 						if (new_parent)
@@ -1712,10 +1712,10 @@ void LLInventoryPanel::modelChanged(U32 mask)
 				{
 					if (view_item)
 					{
-						if ((mask & LLInventoryObserver::REMOVE) != LLInventoryObserver::REMOVE)
+						/*if ((mask & LLInventoryObserver::REMOVE) != LLInventoryObserver::REMOVE)
 						{
-							llwarns << *id_it << " is not in model but in view, but REMOVE flag not set" << llendl;
-						}
+							LL_WARNS_ONCE("LLInventoryPanel::modelChanged") << *id_it << " is not in model but in view, but REMOVE flag not set" << LL_ENDL;
+						}*/
 						// item in view but not model, need to delete view
 						view_item->destroyView();
 					}
