@@ -26,7 +26,6 @@
 #include "llfile.h"
 
 #include "llmath.h"
-#include "llv4math.h"
 
 #include "llfloatertextdump.h"
 
