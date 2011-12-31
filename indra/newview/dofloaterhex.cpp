@@ -24,6 +24,7 @@
 #include "llappviewer.h" // System Folders
 #include "llfloaterperms.h" //get default perms
 #include "llnotificationsutil.h"
+#include "llwearablelist.h" //for wearable copying properly.
 
 std::list<DOFloaterHex*> DOFloaterHex::sInstances;
 S32 DOFloaterHex::sUploadAmount = 10;
@@ -268,6 +269,33 @@ void DOFloaterHex::assetCallback(LLVFS *vfs,
 	}
 }
 
+void wearable_callback(LLWearable* old_wearable, void* userdata)
+{
+	llinfos << "wearable_callback hit" << llendl;
+	LLWearable *wearable = LLWearableList::getInstance()->generateNewWearable();
+	wearable->copyDataFrom(old_wearable);
+
+	LLPermissions perm;
+	perm.setOwnerBits(gAgent.getID(), TRUE, PERM_ALL);
+	wearable->setPermissions(perm);
+
+	// Send to the dataserver
+	wearable->saveNewAsset();
+
+	// Add a new inventory item (shouldn't ever happen here)
+	create_inventory_item(gAgent.getID(),
+						  gAgent.getSessionID(),
+						  gInventory.findCategoryUUIDForType(LLFolderType::assetTypeToFolderType(wearable->getAssetType())),
+						  wearable->getTransactionID(),
+						  std::string((const char*)userdata),
+						  wearable->getDescription(),
+						  wearable->getAssetType(),
+						  LLInventoryType::IT_WEARABLE,
+						  wearable->getType(),
+						  wearable->getPermissions().getMaskNextOwner(),
+						  NULL);
+}
+
 // static
 void DOFloaterHex::onClickUpload(void* user_data)
 {
@@ -297,14 +325,15 @@ void DOFloaterHex::onClickUpload(void* user_data)
 	}
 	delete[] buffer;
 	
-	LLAssetStorage::LLStoreAssetCallback callback = NULL;
-	void *fake_user_data = NULL;
-
-	if(item->getType() != LLAssetType::AT_GESTURE && item->getType() != LLAssetType::AT_LSL_TEXT
+	if(item->getType() == LLAssetType::AT_BODYPART || item->getType() == LLAssetType::AT_CLOTHING)
+	{
+		LLWearableList::getInstance()->getAsset(item->getAssetUUID(), item->getName(), item->getType(), wearable_callback, (void*)item->getName().c_str());
+	}
+	else if(item->getType() != LLAssetType::AT_GESTURE && item->getType() != LLAssetType::AT_LSL_TEXT
 		&& item->getType() != LLAssetType::AT_NOTECARD)
 	{
 		upload_new_resource(transaction_id, 
-			item->getType(), 
+			item->getType(),
 			item->getName(), 
 			item->getDescription(), 
 			0, 
@@ -312,9 +341,9 @@ void DOFloaterHex::onClickUpload(void* user_data)
 			item->getInventoryType(), 
 			LLFloaterPerms::getNextOwnerPerms(), LLFloaterPerms::getGroupPerms(), LLFloaterPerms::getEveryonePerms(),
 			item->getName(),  
-			callback, 
+			(LLAssetStorage::LLStoreAssetCallback)NULL, 
 			sUploadAmount,
-			fake_user_data);
+			(void*)NULL);
 	}
 	else // gestures and scripts, create an item first
 	{ // AND notecards

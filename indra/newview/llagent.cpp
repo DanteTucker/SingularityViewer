@@ -4108,7 +4108,7 @@ void LLAgent::renderAutoPilotTarget()
 		gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 
 		// lovely green
-		gGL.diffuseColor4f(0.f, 1.f, 1.f, 1.f);
+		gGL.color4f(0.f, 1.f, 1.f, 1.f);
 
 		target_global = mAutoPilotTargetGlobal;
 
@@ -4118,7 +4118,7 @@ void LLAgent::renderAutoPilotTarget()
 
 		gGL.scalef(height_meters, height_meters, height_meters);
 
-		gSphere.render(1500.f);
+		gSphere.render();
 
 		gGL.popMatrix();
 	}
