@@ -65,7 +65,7 @@ private:
 	LLStrider<LLVector4a> mV4aStrider;
 public:
 	v4adapt(LLVector4a* vp);
-	inline LLVector3 v4adapt::operator[] (const unsigned int i)
+	inline LLVector3 operator[] (const unsigned int i)
 	{
 		return LLVector3((F32*)&mV4aStrider[i]);
 	}
