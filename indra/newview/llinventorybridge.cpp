@@ -728,10 +728,13 @@ void LLInvFVBridge::getClipboardEntries(bool show_asset_id,
 	addDeleteContextMenuOptions(items, disabled_items);
 
 	// If multiple items are selected, disable properties (if it exists).
+	// Actually, how about no.
+	/*
 	if ((flags & FIRST_SELECTED_ITEM) == 0)
 	{
 		disabled_items.push_back(std::string("Properties"));
 	}
+	*/
 }
 
 void LLInvFVBridge::buildContextMenu(LLMenuGL& menu, U32 flags)
