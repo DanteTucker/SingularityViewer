@@ -25,9 +25,9 @@ public:
 		S32 v1;
 		S32 v2;
 	};
-	typedef std::vector<std::pair<LLVector3, LLVector2>> vert_t;
-	typedef std::vector<LLVector3> vec3_t;
-	typedef std::vector<tri> tri_t;
+	typedef std::vector< std::pair< LLVector3, LLVector2 > > vert_t;
+	typedef std::vector< LLVector3 > vec3_t;
+	typedef std::vector< tri > tri_t;
 	vert_t vertices;
 	vec3_t normals; //null unless otherwise specified!
 	tri_t triangles; //because almost all surfaces in SL are triangles
@@ -65,7 +65,7 @@ private:
 	LLStrider<LLVector4a> mV4aStrider;
 public:
 	v4adapt(LLVector4a* vp);
-	inline LLVector3 v4adapt::operator[] (const unsigned int i)
+	inline LLVector3 operator[] (const unsigned int i)
 	{
 		return LLVector3((F32*)&mV4aStrider[i]);
 	}
