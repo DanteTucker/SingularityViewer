@@ -1255,6 +1255,26 @@ void LLFloater::setFrontmost(BOOL take_focus)
 	}
 }
 
+BOOL LLFloater::handleKeyHere(KEY key, MASK mask)
+{
+	bool pass = FALSE;
+	if (key == 'W' && mask == MASK_CONTROL)
+	{
+		// is user closeable and is system closeable
+		if (canClose() && isCloseable())
+			close();
+		else
+			pass = TRUE;
+	}
+	if(pass)
+	{
+		LLFloater* parent = (LLFloater*)getParent();
+		if(parent)
+			return parent->handleKeyHere(key, mask);
+	}
+	return LLPanel::handleKeyHere(key, mask);
+}
+
 //static
 void LLFloater::setEditModeEnabled(BOOL enable)
 {
