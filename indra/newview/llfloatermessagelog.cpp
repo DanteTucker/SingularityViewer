@@ -386,14 +386,17 @@ BOOL LLMessageLogFilter::set(std::string filter)
 		std::string token = (*iter);
 		LLStringUtil::trim(token);
 		LLStringUtil::toLower(token);
-		BOOL negative = token.find("!") == 0;
-		if(negative)
+		if(token.length() > 0)
 		{
-			token = token.substr(1);
-			mNegativeNames.push_back(token);
+			BOOL negative = token.find("!") == 0;
+			if(negative)
+			{
+				token = token.substr(1);
+				mNegativeNames.push_back(token);
+			}
+			else
+				mPositiveNames.push_back(token);
 		}
-		else
-			mPositiveNames.push_back(token);
 	}
 	return TRUE;
 }
