@@ -47,6 +47,8 @@ public:
 
 	static void onClickExpandBtn(void* user_data);
 	static void onChangePresetName(LLUICtrl* ctrl, void* userData);
+	static void onOpenAdvancedSky(void* userData);
+	static void onOpenAdvancedWater(void* userData);
 
 protected:
 	void build();
