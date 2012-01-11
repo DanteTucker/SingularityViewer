@@ -2172,8 +2172,12 @@ void LLRightClickInventoryFetchDescendentsObserver::done()
 class LLInventoryCopyAndWearObserver : public LLInventoryObserver
 {
 public:
-	LLInventoryCopyAndWearObserver(const LLUUID& cat_id, int count) :
-		mCatID(cat_id), mContentsCount(count), mFolderAdded(FALSE) {}
+	LLInventoryCopyAndWearObserver(const LLUUID& cat_id,
+								   int count,
+								   bool folder_added = false)
+	:	mCatID(cat_id),
+		mContentsCount(count),
+		mFolderAdded(FALSE) {}
 	virtual ~LLInventoryCopyAndWearObserver() {}
 	virtual void changed(U32 mask);
 
@@ -2998,7 +3002,10 @@ bool move_task_inventory_callback(const LLSD& notification, const LLSD& response
 			object->getInventoryContents(inventory_objects);
 			int contents_count = inventory_objects.size()-1; //subtract one for containing folder
 
-			LLInventoryCopyAndWearObserver* inventoryObserver = new LLInventoryCopyAndWearObserver(cat_and_wear->mCatID, contents_count);
+			LLInventoryCopyAndWearObserver* inventoryObserver;
+			inventoryObserver = new LLInventoryCopyAndWearObserver(cat_and_wear->mCatID,
+																   contents_count,
+																   cat_and_wear->mFolderResponded);
 			gInventory.addObserver(inventoryObserver);
 		}
 
