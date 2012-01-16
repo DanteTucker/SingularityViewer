@@ -2321,7 +2321,7 @@ bool LLAppViewer::initConfiguration()
 
 	//random splashtext
 	std::string splashtext_filename = gDirUtilp->getExpandedFilename(LL_PATH_APP_SETTINGS, "splashtext.txt");
-	std::ifstream splashtext_file(splashtext_filename);
+	std::ifstream splashtext_file(splashtext_filename.c_str());
 	std::vector<std::string> splashtext_vec;
 
 	if(splashtext_file.is_open())

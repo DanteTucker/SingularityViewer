@@ -43,6 +43,8 @@
 #include "llwlparammanager.h"
 #include "llwaterparammanager.h"
 #include "llstartup.h"
+#include "llfloaterwindlight.h"
+#include "llfloaterwater.h"
 
 
 BOOL firstBuildDone;
@@ -123,6 +125,10 @@ BOOL wlfPanel_AdvSettings::postBuild()
 	fixPointer = this;
 	/*onClickExpandBtn(fixPointer);
 	onClickExpandBtn(fixPointer);*/
+
+	childSetAction("EnvAdvancedSkyButton", onOpenAdvancedSky, NULL);
+	childSetAction("EnvAdvancedWaterButton", onOpenAdvancedWater, NULL);
+
 	return TRUE;
 }
 void wlfPanel_AdvSettings::draw()
@@ -178,4 +184,14 @@ void wlfPanel_AdvSettings::onChangePresetName(LLUICtrl* ctrl, void * userData)
 		current_preset = combo_box->getSelectedValue().asString();
 		LLWaterParamManager::getInstance()->loadPreset(current_preset);
 	}
+}
+
+void wlfPanel_AdvSettings::onOpenAdvancedSky(void* userData)
+{
+	LLFloaterWindLight::show();
+}
+
+void wlfPanel_AdvSettings::onOpenAdvancedWater(void* userData)
+{
+	LLFloaterWater::show();
 }

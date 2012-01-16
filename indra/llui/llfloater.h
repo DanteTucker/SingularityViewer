@@ -212,6 +212,7 @@ public:
 
 	virtual void	setVisible(BOOL visible);
 	void			setFrontmost(BOOL take_focus = TRUE);
+	/*virtual*/ BOOL handleKeyHere(KEY key, MASK mask);
 
 	// Defaults to false.
 	virtual BOOL	canSaveAs() const { return FALSE; }

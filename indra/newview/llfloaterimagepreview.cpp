@@ -135,8 +135,9 @@ BOOL LLFloaterImagePreview::postBuild()
 		mSculptedPreview = new LLImagePreviewSculpted(256, 256);
 		mSculptedPreview->setPreviewTarget(mRawImagep, 2.0f);
 
-		if (mRawImagep->getWidth() * mRawImagep->getHeight () <= LL_IMAGE_REZ_LOSSLESS_CUTOFF * LL_IMAGE_REZ_LOSSLESS_CUTOFF)
-			childEnable("lossless_check");
+		bool lossless = mRawImagep->getWidth() * mRawImagep->getHeight () <= LL_IMAGE_REZ_LOSSLESS_CUTOFF * LL_IMAGE_REZ_LOSSLESS_CUTOFF;
+		childSetValue("lossless_check", lossless);
+		gSavedSettings.setBOOL("LosslessJ2CUpload", lossless);
 
 		// <edit>
 		gSavedSettings.setBOOL("TemporaryUpload",FALSE);

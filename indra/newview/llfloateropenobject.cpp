@@ -157,13 +157,26 @@ void LLFloaterOpenObject::moveToInventory(bool wear)
 	{
 		parent_category_id = gInventory.getRootFolderID();
 	}
+
+	LLCategoryCreate* cat_data = new LLCategoryCreate(object_id, wear);
 	LLUUID category_id = gInventory.createNewCategory(parent_category_id, 
-		LLFolderType::FT_NONE, 
-		name);
+													  LLFolderType::FT_NONE, 
+													  name,
+													  callbackCreateInventoryCategory,
+													  (void*)cat_data);
+
+
+	// If we get a null category ID, we are using a capability in
+	// createNewCategory and we will handle the following in the
+	// callbackCreateInventoryCategory routine.
+	if (category_id.notNull())
+	{
+		delete cat_data;
 
 	LLCatAndWear* data = new LLCatAndWear;
 	data->mCatID = category_id;
 	data->mWear = wear;
+		data->mFolderResponded = false;
 
 	// Copy and/or move the items into the newly created folder.
 	// Ignore any "you're going to break this item" messages.
@@ -178,6 +191,35 @@ void LLFloaterOpenObject::moveToInventory(bool wear)
 		LLNotificationsUtil::add("OpenObjectCannotCopy");
 	}
 }
+}
+
+// static
+void LLFloaterOpenObject::callbackCreateInventoryCategory(const LLSD& result, void* data)
+{
+	LLCategoryCreate* cat_data = (LLCategoryCreate*)data;
+
+	LLUUID category_id = result["folder_id"].asUUID();
+	LLCatAndWear* wear_data = new LLCatAndWear;
+
+	wear_data->mCatID = category_id;
+	wear_data->mWear = cat_data->mWear;
+	wear_data->mFolderResponded = true;
+
+ 	// Copy and/or move the items into the newly created folder.
+ 	// Ignore any "you're going to break this item" messages.
+
+	BOOL success = move_inv_category_world_to_agent(cat_data->mObjectID, category_id, TRUE,
+ 													callbackMoveInventory, 
+													(void*)wear_data);
+ 	if (!success)
+ 	{
+		delete wear_data;
+		wear_data = NULL;
+
+ 		LLNotifications::instance().add("OpenObjectCannotCopy");
+ 	}
+	delete cat_data;	
+ }
 
 // static
 void LLFloaterOpenObject::callbackMoveInventory(S32 result, void* data)

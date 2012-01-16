@@ -4861,8 +4861,7 @@ void LLPipeline::setupHWLights(LLDrawPool* pool)
 				mLightMovingMask |= (1<<cur_light);
 			}
 			
-			LLColor4  light_color = light->getLightColor();
-			light_color *= light->getLightIntensity();
+			LLColor4  light_color = light->getLightColor(); //intensity calculated with calc_light_dist
 			light_color.mV[3] = 0.0f;
 
 			F32 fade = iter->fade;

@@ -53,7 +53,7 @@
 
 Try saving image as 24 bit Targa (.tga).
 	</text>
-	<check_box bottom="37" control_name="LosslessJ2CUpload" enabled="false"
+	<check_box bottom="37" control_name="LosslessJ2CUpload" enabled="true"
 	     follows="bottom|left" font="SansSerifSmall" height="16"
 	     initial_value="false" label="Use lossless compression" left="10"
 	     left_delta="2" name="lossless_check" width="280" />
